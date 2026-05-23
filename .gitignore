@@ -36,4 +36,4 @@ tmp/
 .cache/
 
 # uploads
-uploads/
+uploads/.env
