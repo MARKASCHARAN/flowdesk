@@ -9,15 +9,39 @@ datasource db {
   provider = "postgresql"
 }
 
+// ENUMS
+
+enum UserStatus {
+  active
+  inactive
+  suspended
+}
+
+enum TicketStatus {
+  open
+  in_progress
+  resolved
+  closed
+}
+
+enum Priority {
+  low
+  medium
+  high
+  critical
+}
+
+// MODELS
+
 model Tenant {
-  id          String   @id @default(uuid())
-  name        String
-  slug        String   @unique
-  domain      String?  @unique
-  plan        String?
-  status      String   @default("active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  domain    String?  @unique
+  plan      String?
+  status    String   @default("active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   users         User[]
   memberships   Membership[]
@@ -39,32 +63,33 @@ model Tenant {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  tenantId     String    @map("tenant_id")
+  id           String     @id @default(uuid())
+  tenantId     String     @map("tenant_id")
   name         String
-  email        String    
-  passwordHash String    @map("password_hash")
-  avatarUrl    String?   @map("avatar_url")
+  email        String
+  passwordHash String     @map("password_hash")
+  avatarUrl    String?    @map("avatar_url")
   phone        String?
-  status       String    @default("active")
-  lastLoginAt  DateTime? @map("last_login_at")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  deletedAt    DateTime? @map("deleted_at")
+  status       UserStatus @default(active)
+  lastLoginAt  DateTime?  @map("last_login_at")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  deletedAt    DateTime?  @map("deleted_at")
 
-  tenant        Tenant         @relation(fields: [tenantId], references: [id])
-  memberships   Membership[]
-  sessions      Session[]
-  tickets       Ticket[]
-  comments      Comment[]
-  notifications Notification[]
-  auditLogs     AuditLog[]
-  assignedLeads Lead[]
-  createdNotes  Note[]         @relation("CreatedNotes")
-  createdTickets Ticket[]      @relation("CreatedTickets")
+  tenant         Tenant         @relation(fields: [tenantId], references: [id])
+  memberships    Membership[]
+  sessions       Session[]
+  tickets        Ticket[]
+  comments       Comment[]
+  notifications  Notification[]
+  auditLogs      AuditLog[]
+  assignedLeads  Lead[]
+  createdNotes   Note[]         @relation("CreatedNotes")
+  createdTickets Ticket[]       @relation("CreatedTickets")
 
   @@unique([tenantId, email])
   @@index([email])
+  @@index([tenantId])
   @@map("users")
 }
 
@@ -88,19 +113,39 @@ model Role {
   tenantId    String   @map("tenant_id")
   name        String
   description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  tenant      Tenant           @relation(fields: [tenantId], references: [id])
   memberships Membership[]
+  permissions RolePermission[]
 
+  @@unique([tenantId, name])
   @@map("roles")
 }
 
 model Permission {
-  id          String  @id @default(uuid())
-  key         String  @unique
+  id          String   @id @default(uuid())
+  key         String   @unique
   description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  roles RolePermission[]
 
   @@map("permissions")
+}
+
+model RolePermission {
+  id           String @id @default(uuid())
+  roleId       String @map("role_id")
+  permissionId String @map("permission_id")
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
 }
 
 model Membership {
@@ -119,24 +164,27 @@ model Membership {
 }
 
 model Customer {
-  id        String   @id @default(uuid())
-  tenantId  String   @map("tenant_id")
-  ownerId   String?  @map("owner_id")
+  id        String    @id @default(uuid())
+  tenantId  String    @map("tenant_id")
+  ownerId   String?   @map("owner_id")
   name      String
   email     String?
   phone     String?
   company   String?
   tags      Json?
-  status    String   @default("active")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  status    String    @default("active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   tenant  Tenant   @relation(fields: [tenantId], references: [id])
   leads   Lead[]
   notes   Note[]
   tickets Ticket[]
 
+  @@unique([tenantId, email])
   @@index([name])
+  @@index([tenantId, name])
   @@map("customers")
 }
 
@@ -173,22 +221,22 @@ model Note {
 }
 
 model Ticket {
-  id          String    @id @default(uuid())
-  tenantId    String    @map("tenant_id")
-  customerId  String    @map("customer_id")
-  assigneeId  String?   @map("assignee_id")
-  createdBy   String    @map("created_by")
+  id          String       @id @default(uuid())
+  tenantId    String       @map("tenant_id")
+  customerId  String       @map("customer_id")
+  assigneeId  String?      @map("assignee_id")
+  createdBy   String       @map("created_by")
   title       String
   description String
-  priority    String
-  status      String
+  priority    Priority
+  status      TicketStatus
   category    String?
-  slaDueAt    DateTime? @map("sla_due_at")
-  resolvedAt  DateTime? @map("resolved_at")
-  closedAt    DateTime? @map("closed_at")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
+  slaDueAt    DateTime?    @map("sla_due_at")
+  resolvedAt  DateTime?    @map("resolved_at")
+  closedAt    DateTime?    @map("closed_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  deletedAt   DateTime?    @map("deleted_at")
 
   tenant      Tenant       @relation(fields: [tenantId], references: [id])
   customer    Customer     @relation(fields: [customerId], references: [id])
@@ -200,19 +248,22 @@ model Ticket {
   @@index([title])
   @@index([status])
   @@index([priority])
+  @@index([tenantId, status])
+  @@index([tenantId, assigneeId])
   @@map("tickets")
 }
 
 model Comment {
-  id              String   @id @default(uuid())
-  tenantId        String   @map("tenant_id")
-  ticketId        String   @map("ticket_id")
-  userId          String   @map("user_id")
-  parentCommentId String?  @map("parent_comment_id")
+  id              String    @id @default(uuid())
+  tenantId        String    @map("tenant_id")
+  ticketId        String    @map("ticket_id")
+  userId          String    @map("user_id")
+  parentCommentId String?   @map("parent_comment_id")
   body            String
-  isInternal      Boolean  @default(false) @map("is_internal")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  isInternal      Boolean   @default(false) @map("is_internal")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
 
   tenant        Tenant    @relation(fields: [tenantId], references: [id])
   ticket        Ticket    @relation(fields: [ticketId], references: [id])
@@ -225,15 +276,16 @@ model Comment {
 }
 
 model Attachment {
-  id         String   @id @default(uuid())
-  tenantId   String   @map("tenant_id")
-  ticketId   String   @map("ticket_id")
-  uploadedBy String   @map("uploaded_by")
-  fileName   String   @map("file_name")
-  fileUrl    String   @map("file_url")
-  fileSize   Int      @map("file_size")
-  mimeType   String   @map("mime_type")
-  createdAt  DateTime @default(now()) @map("created_at")
+  id         String    @id @default(uuid())
+  tenantId   String    @map("tenant_id")
+  ticketId   String    @map("ticket_id")
+  uploadedBy String    @map("uploaded_by")
+  fileName   String    @map("file_name")
+  fileUrl    String    @map("file_url")
+  fileSize   Int       @map("file_size")
+  mimeType   String    @map("mime_type")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  deletedAt  DateTime? @map("deleted_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
   ticket Ticket @relation(fields: [ticketId], references: [id])
@@ -256,6 +308,7 @@ model Notification {
   tenant Tenant @relation(fields: [tenantId], references: [id])
   user   User   @relation(fields: [userId], references: [id])
 
+  @@index([userId, isRead])
   @@map("notifications")
 }
 
@@ -283,16 +336,18 @@ model Payment {
   subscriptionId String    @map("subscription_id")
   provider       String
   providerRef    String?   @map("provider_ref")
-  amount         Decimal
+  amount         Decimal   @db.Decimal(10, 2)
   currency       String
   status         String
   paidAt         DateTime? @map("paid_at")
   createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
   tenant       Tenant       @relation(fields: [tenantId], references: [id])
   subscription Subscription @relation(fields: [subscriptionId], references: [id])
 
   @@index([subscriptionId])
+  @@index([tenantId, status])
   @@map("payments")
 }
 
@@ -301,15 +356,18 @@ model Invoice {
   tenantId       String    @map("tenant_id")
   subscriptionId String    @map("subscription_id")
   invoiceNumber  String    @map("invoice_number")
-  amount         Decimal
+  amount         Decimal   @db.Decimal(10, 2)
   dueDate        DateTime? @map("due_date")
   status         String
   pdfUrl         String?   @map("pdf_url")
   createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
 
   tenant       Tenant       @relation(fields: [tenantId], references: [id])
   subscription Subscription @relation(fields: [subscriptionId], references: [id])
 
+  @@unique([invoiceNumber])
   @@map("invoices")
 }
 
@@ -323,6 +381,7 @@ model AuditLog {
   metadata     Json?
   ipAddress    String?  @map("ip_address")
   createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
   user   User?  @relation(fields: [userId], references: [id])
@@ -337,8 +396,21 @@ model Report {
   type        String
   fileUrl     String   @map("file_url")
   createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
   @@map("reports")
+}
+
+model WebhookEvent {
+  id        String   @id @default(uuid())
+  provider  String
+  eventType String
+  payload   Json
+  processed Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("webhook_events")
 }

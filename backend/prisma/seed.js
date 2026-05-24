@@ -27,16 +27,24 @@ async function main() {
   console.log('Created tenant:', tenant.name);
 
   // Create Roles
-  const adminRole = await prisma.role.create({
-    data: {
+  const adminRole = await prisma.role.upsert({
+    where: {
+      tenantId_name: { tenantId: tenant.id, name: 'Admin' },
+    },
+    update: {},
+    create: {
       tenantId: tenant.id,
       name: 'Admin',
       description: 'Full access to all resources',
     },
   });
 
-  const agentRole = await prisma.role.create({
-    data: {
+  const agentRole = await prisma.role.upsert({
+    where: {
+      tenantId_name: { tenantId: tenant.id, name: 'Agent' },
+    },
+    update: {},
+    create: {
       tenantId: tenant.id,
       name: 'Agent',
       description: 'Access to CRM and tickets',
@@ -79,8 +87,12 @@ async function main() {
   });
 
   // Create Customer
-  const customer = await prisma.customer.create({
-    data: {
+  const customer = await prisma.customer.upsert({
+    where: {
+      tenantId_email: { tenantId: tenant.id, email: 'contact@globex.com' },
+    },
+    update: {},
+    create: {
       tenantId: tenant.id,
       ownerId: adminUser.id,
       name: 'Globex Corporation',

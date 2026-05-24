@@ -1,3 +1,12 @@
+-- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('active', 'inactive', 'suspended');
+
+-- CreateEnum
+CREATE TYPE "TicketStatus" AS ENUM ('open', 'in_progress', 'resolved', 'closed');
+
+-- CreateEnum
+CREATE TYPE "Priority" AS ENUM ('low', 'medium', 'high', 'critical');
+
 -- CreateTable
 CREATE TABLE "tenants" (
     "id" TEXT NOT NULL,
@@ -21,7 +30,7 @@ CREATE TABLE "users" (
     "password_hash" TEXT NOT NULL,
     "avatar_url" TEXT,
     "phone" TEXT,
-    "status" TEXT NOT NULL DEFAULT 'active',
+    "status" "UserStatus" NOT NULL DEFAULT 'active',
     "last_login_at" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -49,6 +58,8 @@ CREATE TABLE "roles" (
     "tenant_id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "roles_pkey" PRIMARY KEY ("id")
 );
@@ -58,8 +69,19 @@ CREATE TABLE "permissions" (
     "id" TEXT NOT NULL,
     "key" TEXT NOT NULL,
     "description" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "permissions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "role_permissions" (
+    "id" TEXT NOT NULL,
+    "role_id" TEXT NOT NULL,
+    "permission_id" TEXT NOT NULL,
+
+    CONSTRAINT "role_permissions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -86,6 +108,7 @@ CREATE TABLE "customers" (
     "status" TEXT NOT NULL DEFAULT 'active',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "customers_pkey" PRIMARY KEY ("id")
 );
@@ -125,8 +148,8 @@ CREATE TABLE "tickets" (
     "created_by" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "priority" TEXT NOT NULL,
-    "status" TEXT NOT NULL,
+    "priority" "Priority" NOT NULL,
+    "status" "TicketStatus" NOT NULL,
     "category" TEXT,
     "sla_due_at" TIMESTAMP(3),
     "resolved_at" TIMESTAMP(3),
@@ -149,6 +172,7 @@ CREATE TABLE "comments" (
     "is_internal" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "comments_pkey" PRIMARY KEY ("id")
 );
@@ -164,6 +188,7 @@ CREATE TABLE "attachments" (
     "file_size" INTEGER NOT NULL,
     "mime_type" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "attachments_pkey" PRIMARY KEY ("id")
 );
@@ -205,11 +230,12 @@ CREATE TABLE "payments" (
     "subscription_id" TEXT NOT NULL,
     "provider" TEXT NOT NULL,
     "provider_ref" TEXT,
-    "amount" DECIMAL(65,30) NOT NULL,
+    "amount" DECIMAL(10,2) NOT NULL,
     "currency" TEXT NOT NULL,
     "status" TEXT NOT NULL,
     "paid_at" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
 );
@@ -220,11 +246,13 @@ CREATE TABLE "invoices" (
     "tenant_id" TEXT NOT NULL,
     "subscription_id" TEXT NOT NULL,
     "invoice_number" TEXT NOT NULL,
-    "amount" DECIMAL(65,30) NOT NULL,
+    "amount" DECIMAL(10,2) NOT NULL,
     "due_date" TIMESTAMP(3),
     "status" TEXT NOT NULL,
     "pdf_url" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "invoices_pkey" PRIMARY KEY ("id")
 );
@@ -240,6 +268,7 @@ CREATE TABLE "audit_logs" (
     "metadata" JSONB,
     "ip_address" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "audit_logs_pkey" PRIMARY KEY ("id")
 );
@@ -252,8 +281,22 @@ CREATE TABLE "reports" (
     "type" TEXT NOT NULL,
     "file_url" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "reports_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "webhook_events" (
+    "id" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
+    "eventType" TEXT NOT NULL,
+    "payload" JSONB NOT NULL,
+    "processed" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "webhook_events_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -266,6 +309,9 @@ CREATE UNIQUE INDEX "tenants_domain_key" ON "tenants"("domain");
 CREATE INDEX "users_email_idx" ON "users"("email");
 
 -- CreateIndex
+CREATE INDEX "users_tenant_id_idx" ON "users"("tenant_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "users_tenant_id_email_key" ON "users"("tenant_id", "email");
 
 -- CreateIndex
@@ -275,13 +321,25 @@ CREATE UNIQUE INDEX "sessions_refresh_token_key" ON "sessions"("refresh_token");
 CREATE INDEX "sessions_refresh_token_idx" ON "sessions"("refresh_token");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "roles_tenant_id_name_key" ON "roles"("tenant_id", "name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "permissions_key_key" ON "permissions"("key");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "role_permissions_role_id_permission_id_key" ON "role_permissions"("role_id", "permission_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "memberships_tenant_id_user_id_key" ON "memberships"("tenant_id", "user_id");
 
 -- CreateIndex
 CREATE INDEX "customers_name_idx" ON "customers"("name");
+
+-- CreateIndex
+CREATE INDEX "customers_tenant_id_name_idx" ON "customers"("tenant_id", "name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "customers_tenant_id_email_key" ON "customers"("tenant_id", "email");
 
 -- CreateIndex
 CREATE INDEX "tickets_title_idx" ON "tickets"("title");
@@ -293,13 +351,28 @@ CREATE INDEX "tickets_status_idx" ON "tickets"("status");
 CREATE INDEX "tickets_priority_idx" ON "tickets"("priority");
 
 -- CreateIndex
+CREATE INDEX "tickets_tenant_id_status_idx" ON "tickets"("tenant_id", "status");
+
+-- CreateIndex
+CREATE INDEX "tickets_tenant_id_assignee_id_idx" ON "tickets"("tenant_id", "assignee_id");
+
+-- CreateIndex
 CREATE INDEX "comments_ticket_id_idx" ON "comments"("ticket_id");
 
 -- CreateIndex
 CREATE INDEX "attachments_ticket_id_idx" ON "attachments"("ticket_id");
 
 -- CreateIndex
+CREATE INDEX "notifications_user_id_is_read_idx" ON "notifications"("user_id", "is_read");
+
+-- CreateIndex
 CREATE INDEX "payments_subscription_id_idx" ON "payments"("subscription_id");
+
+-- CreateIndex
+CREATE INDEX "payments_tenant_id_status_idx" ON "payments"("tenant_id", "status");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "invoices_invoice_number_key" ON "invoices"("invoice_number");
 
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -309,6 +382,12 @@ ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user
 
 -- AddForeignKey
 ALTER TABLE "roles" ADD CONSTRAINT "roles_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_permission_id_fkey" FOREIGN KEY ("permission_id") REFERENCES "permissions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "memberships" ADD CONSTRAINT "memberships_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
