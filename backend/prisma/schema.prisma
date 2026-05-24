@@ -1,13 +1,344 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  domain      String?  @unique
+  plan        String?
+  status      String   @default("active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users         User[]
+  memberships   Membership[]
+  customers     Customer[]
+  tickets       Ticket[]
+  subscriptions Subscription[]
+  roles         Role[]
+  auditLogs     AuditLog[]
+  reports       Report[]
+  leads         Lead[]
+  notes         Note[]
+  comments      Comment[]
+  attachments   Attachment[]
+  notifications Notification[]
+  payments      Payment[]
+  invoices      Invoice[]
+
+  @@map("tenants")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  name         String
+  email        String    
+  passwordHash String    @map("password_hash")
+  avatarUrl    String?   @map("avatar_url")
+  phone        String?
+  status       String    @default("active")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+  memberships   Membership[]
+  sessions      Session[]
+  tickets       Ticket[]
+  comments      Comment[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  assignedLeads Lead[]
+  createdNotes  Note[]         @relation("CreatedNotes")
+  createdTickets Ticket[]      @relation("CreatedTickets")
+
+  @@unique([tenantId, email])
+  @@index([email])
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  refreshToken String   @unique @map("refresh_token")
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([refreshToken])
+  @@map("sessions")
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  tenantId    String   @map("tenant_id")
+  name        String
+  description String?
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  memberships Membership[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String  @id @default(uuid())
+  key         String  @unique
+  description String?
+
+  @@map("permissions")
+}
+
+model Membership {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  userId    String   @map("user_id")
+  roleId    String   @map("role_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  @@unique([tenantId, userId])
+  @@map("memberships")
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  ownerId   String?  @map("owner_id")
+  name      String
+  email     String?
+  phone     String?
+  company   String?
+  tags      Json?
+  status    String   @default("active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant  Tenant   @relation(fields: [tenantId], references: [id])
+  leads   Lead[]
+  notes   Note[]
+  tickets Ticket[]
+
+  @@index([name])
+  @@map("customers")
+}
+
+model Lead {
+  id         String   @id @default(uuid())
+  tenantId   String   @map("tenant_id")
+  customerId String   @map("customer_id")
+  source     String?
+  stage      String
+  assignedTo String?  @map("assigned_to")
+  priority   String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+  assignee User?    @relation(fields: [assignedTo], references: [id])
+
+  @@map("leads")
+}
+
+model Note {
+  id         String   @id @default(uuid())
+  tenantId   String   @map("tenant_id")
+  customerId String   @map("customer_id")
+  createdBy  String   @map("created_by")
+  body       String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+  creator  User     @relation("CreatedNotes", fields: [createdBy], references: [id])
+
+  @@map("notes")
+}
+
+model Ticket {
+  id          String    @id @default(uuid())
+  tenantId    String    @map("tenant_id")
+  customerId  String    @map("customer_id")
+  assigneeId  String?   @map("assignee_id")
+  createdBy   String    @map("created_by")
+  title       String
+  description String
+  priority    String
+  status      String
+  category    String?
+  slaDueAt    DateTime? @map("sla_due_at")
+  resolvedAt  DateTime? @map("resolved_at")
+  closedAt    DateTime? @map("closed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  customer    Customer     @relation(fields: [customerId], references: [id])
+  assignee    User?        @relation(fields: [assigneeId], references: [id])
+  creator     User         @relation("CreatedTickets", fields: [createdBy], references: [id])
+  comments    Comment[]
+  attachments Attachment[]
+
+  @@index([title])
+  @@index([status])
+  @@index([priority])
+  @@map("tickets")
+}
+
+model Comment {
+  id              String   @id @default(uuid())
+  tenantId        String   @map("tenant_id")
+  ticketId        String   @map("ticket_id")
+  userId          String   @map("user_id")
+  parentCommentId String?  @map("parent_comment_id")
+  body            String
+  isInternal      Boolean  @default(false) @map("is_internal")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+  ticket        Ticket    @relation(fields: [ticketId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
+  parentComment Comment?  @relation("ThreadComments", fields: [parentCommentId], references: [id])
+  replies       Comment[] @relation("ThreadComments")
+
+  @@index([ticketId])
+  @@map("comments")
+}
+
+model Attachment {
+  id         String   @id @default(uuid())
+  tenantId   String   @map("tenant_id")
+  ticketId   String   @map("ticket_id")
+  uploadedBy String   @map("uploaded_by")
+  fileName   String   @map("file_name")
+  fileUrl    String   @map("file_url")
+  fileSize   Int      @map("file_size")
+  mimeType   String   @map("mime_type")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+
+  @@index([ticketId])
+  @@map("attachments")
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  tenantId  String    @map("tenant_id")
+  userId    String    @map("user_id")
+  type      String
+  title     String
+  body      String
+  isRead    Boolean   @default(false) @map("is_read")
+  sentAt    DateTime? @map("sent_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model Subscription {
+  id        String    @id @default(uuid())
+  tenantId  String    @map("tenant_id")
+  plan      String
+  seats     Int       @default(1)
+  usage     Json?
+  startsAt  DateTime? @map("starts_at")
+  endsAt    DateTime? @map("ends_at")
+  status    String    @default("active")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id])
+  payments Payment[]
+  invoices Invoice[]
+
+  @@map("subscriptions")
+}
+
+model Payment {
+  id             String    @id @default(uuid())
+  tenantId       String    @map("tenant_id")
+  subscriptionId String    @map("subscription_id")
+  provider       String
+  providerRef    String?   @map("provider_ref")
+  amount         Decimal
+  currency       String
+  status         String
+  paidAt         DateTime? @map("paid_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@index([subscriptionId])
+  @@map("payments")
+}
+
+model Invoice {
+  id             String    @id @default(uuid())
+  tenantId       String    @map("tenant_id")
+  subscriptionId String    @map("subscription_id")
+  invoiceNumber  String    @map("invoice_number")
+  amount         Decimal
+  dueDate        DateTime? @map("due_date")
+  status         String
+  pdfUrl         String?   @map("pdf_url")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@map("invoices")
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  tenantId     String   @map("tenant_id")
+  userId       String?  @map("user_id")
+  action       String
+  resourceType String   @map("resource_type")
+  resourceId   String   @map("resource_id")
+  metadata     Json?
+  ipAddress    String?  @map("ip_address")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User?  @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model Report {
+  id          String   @id @default(uuid())
+  tenantId    String   @map("tenant_id")
+  generatedBy String?  @map("generated_by")
+  type        String
+  fileUrl     String   @map("file_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("reports")
 }
