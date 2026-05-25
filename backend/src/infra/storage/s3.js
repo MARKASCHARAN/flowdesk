@@ -29,3 +29,24 @@ export const uploadFileToS3 = async (file, destinationKey) => {
 
   return `https://${config.aws.s3BucketName}.s3.${config.aws.region}.amazonaws.com/${destinationKey}`;
 };
+
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+/**
+ * Industry Standard: Generate a presigned URL so the client can upload 
+ * directly to S3, bypassing our Node.js server entirely.
+ */
+export const generatePresignedUrl = async (destinationKey, contentType, expiresIn = 3600) => {
+  const command = new PutObjectCommand({
+    Bucket: config.aws.s3BucketName || 'mock-bucket',
+    Key: destinationKey,
+    ContentType: contentType,
+  });
+
+  const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn });
+  
+  return {
+    uploadUrl,
+    fileUrl: `https://${config.aws.s3BucketName || 'mock-bucket'}.s3.${config.aws.region || 'us-east-1'}.amazonaws.com/${destinationKey}`
+  };
+};

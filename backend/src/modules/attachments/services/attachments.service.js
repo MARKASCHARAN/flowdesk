@@ -1,34 +1,36 @@
 import { attachmentsRepository } from '../repositories/attachments.repository.js';
 import { AppError } from '../../../infra/errors/AppError.js';
 import { prisma } from '../../../infra/db/prisma.js';
-import { uploadFileToS3 } from '../../../infra/storage/s3.js';
+import { generatePresignedUrl } from '../../../infra/storage/s3.js';
 import crypto from 'crypto';
 import path from 'path';
 
 export const attachmentsService = {
-  async uploadAttachment(tenantId, ticketId, userId, file) {
+  async generatePresignedUrl(tenantId, ticketId, userId, fileName, mimeType, fileSize) {
     // 1. Verify Ticket exists
     const ticket = await prisma.ticket.findFirst({ where: { id: ticketId, tenantId, deletedAt: null } });
     if (!ticket) {
       throw new AppError(404, 'Ticket not found');
     }
 
-    // 2. Upload to S3
-    const ext = path.extname(file.originalname);
+    // 2. Generate destination key with strict tenant isolation path
+    const ext = path.extname(fileName);
     const uniqueId = crypto.randomBytes(8).toString('hex');
     const destinationKey = `attachments/${tenantId}/${ticketId}/${uniqueId}${ext}`;
     
-    const fileUrl = await uploadFileToS3(file, destinationKey);
+    // 3. Generate presigned URL
+    const { uploadUrl, fileUrl } = await generatePresignedUrl(destinationKey, mimeType);
 
-    // 3. Save to DB
+    // 4. Save placeholder/record to DB
     const data = {
-      fileName: file.originalname,
-      fileSize: file.size,
-      mimeType: file.mimetype,
+      fileName,
+      fileSize,
+      mimeType,
       fileUrl,
     };
+    const attachment = await attachmentsRepository.createAttachment(tenantId, ticketId, userId, data);
 
-    return attachmentsRepository.createAttachment(tenantId, ticketId, userId, data);
+    return { uploadUrl, attachment };
   },
 
   async getAttachmentsForTicket(tenantId, ticketId) {

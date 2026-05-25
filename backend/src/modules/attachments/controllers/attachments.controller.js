@@ -3,20 +3,23 @@ import { sendResponse } from '../../../infra/utils/response.js';
 import { AppError } from '../../../infra/errors/AppError.js';
 
 export const attachmentsController = {
-  async uploadAttachment(req, res, next) {
+  async getPresignedUrl(req, res, next) {
     try {
-      if (!req.file) {
-        throw new AppError(400, 'No file provided');
+      const { fileName, mimeType, fileSize } = req.body;
+      if (!fileName || !mimeType || !fileSize) {
+        throw new AppError(400, 'Missing fileName, mimeType, or fileSize in body');
       }
 
-      const attachment = await attachmentsService.uploadAttachment(
+      const result = await attachmentsService.generatePresignedUrl(
         res.locals.tenantId,
         req.params.ticketId,
         req.user.id,
-        req.file
+        fileName,
+        mimeType,
+        fileSize
       );
       
-      sendResponse(res, 201, attachment, 'Attachment uploaded successfully');
+      sendResponse(res, 201, result, 'Presigned URL generated successfully');
     } catch (error) {
       next(error);
     }

@@ -13,10 +13,9 @@ router.use(requireAuth, requireTenant);
 
 // Note: These routes are logically scoped by ticket
 router.post(
-  '/ticket/:ticketId',
-  validate(attachmentsValidation.paramTicketId),
-  memoryUpload.single('file'),
-  attachmentsController.uploadAttachment
+  '/ticket/:ticketId/presigned-url',
+  validate(attachmentsValidation.presignedUrl),
+  attachmentsController.getPresignedUrl
 );
 
 router.get(
