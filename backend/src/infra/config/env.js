@@ -10,10 +10,10 @@ const envSchema = joi.object({
   REDIS_URL: joi.string().required(),
   JWT_SECRET: joi.string().required(),
   JWT_EXPIRES_IN: joi.string().default('1d'),
-  AWS_REGION: joi.string().default('us-east-1'),
-  AWS_ACCESS_KEY_ID: joi.string().optional(),
-  AWS_SECRET_ACCESS_KEY: joi.string().optional(),
-  S3_BUCKET_NAME: joi.string().optional(),
+  AWS_REGION: joi.string().allow('').default('us-east-1'),
+  AWS_ACCESS_KEY_ID: joi.string().allow('').optional(),
+  AWS_SECRET_ACCESS_KEY: joi.string().allow('').optional(),
+  S3_BUCKET_NAME: joi.string().allow('').optional(),
   LOG_LEVEL: joi.string().valid('fatal', 'error', 'warn', 'info', 'debug', 'trace').default('info'),
 }).unknown(true);
 

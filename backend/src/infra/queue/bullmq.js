@@ -22,3 +22,4 @@ export const createQueue = (queueName) => {
 
 // Export a default queue for generic async jobs
 export const defaultQueue = createQueue('default-queue');
+export const exportQueue = createQueue('export-queue');
