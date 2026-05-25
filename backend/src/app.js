@@ -71,8 +71,10 @@ app.post(
  * ------------------------------------------------------------------------
  * Industry standard: Parse incoming JSON payloads and URL-encoded data.
  */
+import { contextMiddleware } from './api/middlewares/context.js';
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(contextMiddleware); // Initialize AsyncLocalStorage context
 
 /**
  * ------------------------------------------------------------------------
@@ -87,7 +89,7 @@ app.get('/health', (req, res) => {
 
 /**
  * ------------------------------------------------------------------------
- * 6. API Routes Mounting
+ * 7. API Routes Mounting
  * ------------------------------------------------------------------------
  */
 app.use('/api/v1/auth', authRoutes);

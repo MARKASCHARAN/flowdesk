@@ -22,7 +22,9 @@ const adapter = new PrismaPg(pool);
  * It is configured to emit events rather than logging directly to stdout, allowing us 
  * to pipe all database logs through our centralized Pino logger for observability.
  */
-export const prisma = new PrismaClient({
+import { auditExtension } from './auditExtension.js';
+
+const basePrisma = new PrismaClient({
   adapter,
   log: [
     { emit: 'event', level: 'query' },
@@ -32,20 +34,22 @@ export const prisma = new PrismaClient({
   ],
 });
 
-prisma.$on('query', (e) => {
+export const prisma = auditExtension(basePrisma);
+
+basePrisma.$on('query', (e) => {
   if (config.env === 'development') {
     logger.debug(`Query: ${e.query} - Duration: ${e.duration}ms`);
   }
 });
 
-prisma.$on('error', (e) => {
+basePrisma.$on('error', (e) => {
   logger.error(`Prisma Error: ${e.message}`);
 });
 
-prisma.$on('info', (e) => {
+basePrisma.$on('info', (e) => {
   logger.info(`Prisma Info: ${e.message}`);
 });
 
-prisma.$on('warn', (e) => {
+basePrisma.$on('warn', (e) => {
   logger.warn(`Prisma Warn: ${e.message}`);
 });

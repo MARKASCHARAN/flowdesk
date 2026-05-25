@@ -12,6 +12,16 @@ export const requireAuth = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, config.jwt.secret);
     req.user = decoded; // The payload of the token
+
+    // Inject into AsyncLocalStorage for Prisma Extension Audit Logs
+    import('./context.js').then(({ requestContext }) => {
+      const store = requestContext.getStore();
+      if (store) {
+        store.set('userId', decoded.id);
+        store.set('tenantId', decoded.tenantId);
+      }
+    });
+
     next();
   } catch (err) {
     return next(new AppError(401, 'Unauthorized: Token expired or invalid'));
