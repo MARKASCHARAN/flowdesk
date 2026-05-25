@@ -10,6 +10,7 @@ import { authRoutes } from './modules/auth/index.js';
 import { usersRoutes } from './modules/users/index.js';
 import { tenantsRoutes } from './modules/tenants/index.js';
 import { rbacRoutes } from './modules/rbac/index.js';
+import { crmRoutes } from './modules/crm/index.js';
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/tenants', tenantsRoutes);
 app.use('/api/v1/rbac', rbacRoutes);
+app.use('/api/v1/crm', crmRoutes);
 
 /**
  * ------------------------------------------------------------------------
