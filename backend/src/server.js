@@ -1,7 +1,7 @@
 import app from './app.js';
 import { config } from './infra/config/env.js';
 import logger from './infra/logger/index.js';
-import { startAllWorkers } from './infra/queue/index.js';
+import { startAllWorkers } from './jobs/index.js';
 
 /**
  * Handle Uncaught Exceptions
@@ -27,6 +27,10 @@ const server = app.listen(config.port, () => {
   // Initialize Background Queue Workers
   startAllWorkers();
 });
+
+// Initialize WebSockets
+import { initSocketServer } from './infra/websocket/socket.js';
+initSocketServer(server);
 
 /**
  * Handle Unhandled Rejections

@@ -1,6 +1,7 @@
 import { commentsRepository } from '../repositories/comments.repository.js';
 import { AppError } from '../../../infra/errors/AppError.js';
 import { prisma } from '../../../infra/db/prisma.js';
+import { getSocketServer } from '../../../infra/websocket/socket.js';
 
 export const commentsService = {
   async createComment(tenantId, ticketId, userId, data) {
@@ -13,7 +14,13 @@ export const commentsService = {
       if (!parent) throw new AppError(404, 'Parent comment not found');
     }
 
-    return commentsRepository.createComment(tenantId, ticketId, userId, data);
+    const newComment = await commentsRepository.createComment(tenantId, ticketId, userId, data);
+
+    // Broadcast the new comment to everyone viewing this ticket
+    const io = getSocketServer();
+    io.to(`ticket_${ticketId}`).emit('comment:new', newComment);
+
+    return newComment;
   },
 
   async getCommentsForTicket(tenantId, ticketId, options) {

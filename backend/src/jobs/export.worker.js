@@ -1,16 +1,13 @@
 import { Worker } from 'bullmq';
-import { redis } from '../../cache/redis.js';
-import { logger } from '../../logger/index.js';
-import { notificationsService } from '../../../modules/notifications/services/notifications.service.js';
+import { redis } from '../infra/cache/redis.js';
+import { logger } from '../infra/logger/index.js';
+import { notificationsService } from '../modules/notifications/services/notifications.service.js';
 
 export const startExportWorker = () => {
   const worker = new Worker('export-queue', async (job) => {
     logger.info(`[ExportWorker] Processing export for tenant ${job.data.tenantId}, user ${job.data.userId}`);
-    
-    // Simulate heavy DB query, CSV generation, S3 upload
     await new Promise((resolve) => setTimeout(resolve, 5000));
     
-    // Create an in-app notification when export is ready
     await notificationsService.createNotification(job.data.tenantId, job.data.userId, {
       type: 'export_complete',
       title: 'Export Ready',
@@ -20,9 +17,6 @@ export const startExportWorker = () => {
     logger.info(`[ExportWorker] Export completed for user ${job.data.userId}`);
   }, { connection: redis });
 
-  worker.on('failed', (job, err) => {
-    logger.error(`[ExportWorker] Job ${job.id} failed: ${err.message}`);
-  });
-
+  worker.on('failed', (job, err) => logger.error(`[ExportWorker] Job ${job.id} failed: ${err.message}`));
   return worker;
 };

@@ -1,6 +1,7 @@
 import { ticketsRepository } from '../repositories/tickets.repository.js';
 import { AppError } from '../../../infra/errors/AppError.js';
 import { uploadFileToS3 } from '../../../infra/storage/s3.js';
+import { getSocketServer } from '../../../infra/websocket/socket.js';
 import crypto from 'crypto';
 import path from 'path';
 
@@ -11,7 +12,13 @@ export const ticketsService = {
       ...data,
       status: 'open', // Default status
     };
-    return ticketsRepository.createTicket(tenantId, createdBy, ticketData);
+    const newTicket = await ticketsRepository.createTicket(tenantId, createdBy, ticketData);
+    
+    // Alert online tenant admins/agents
+    const io = getSocketServer();
+    io.to(`tenant_${tenantId}`).emit('ticket:created', newTicket);
+
+    return newTicket;
   },
 
   async getTickets(tenantId, options) {
@@ -35,6 +42,11 @@ export const ticketsService = {
 
     const ticket = await ticketsRepository.updateTicket(id, tenantId, data);
     if (!ticket) throw new AppError(404, 'Ticket not found');
+
+    // Broadcast update to anyone viewing the ticket
+    const io = getSocketServer();
+    io.to(`ticket_${id}`).emit('ticket:updated', ticket);
+
     return ticket;
   },
 
