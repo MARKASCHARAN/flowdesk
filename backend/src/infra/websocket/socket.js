@@ -1,5 +1,5 @@
 import { Server } from 'socket.io';
-import { logger } from '../logger/index.js';
+import logger from '../logger/index.js';
 import { config } from '../config/env.js';
 import jwt from 'jsonwebtoken';
 import { redis } from '../cache/redis.js';

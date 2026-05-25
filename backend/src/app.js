@@ -15,6 +15,8 @@ import { ticketsRoutes } from './modules/tickets/index.js';
 import { commentsRoutes } from './modules/comments/index.js';
 import { notificationsRoutes } from './modules/notifications/index.js';
 import { attachmentsRoutes } from './modules/attachments/index.js';
+import { searchRoutes } from './modules/search/index.js';
+import { auditLogsRoutes } from './modules/audit-logs/index.js';
 
 const app = express();
 
@@ -83,6 +85,8 @@ app.use('/api/v1/tickets', ticketsRoutes);
 app.use('/api/v1/comments', commentsRoutes);
 app.use('/api/v1/notifications', notificationsRoutes);
 app.use('/api/v1/attachments', attachmentsRoutes);
+app.use('/api/v1/search', searchRoutes);
+app.use('/api/v1/audit-logs', auditLogsRoutes);
 
 /**
  * ------------------------------------------------------------------------
@@ -91,7 +95,7 @@ app.use('/api/v1/attachments', attachmentsRoutes);
  * Industry standard: If a request makes it past all routes without being 
  * resolved, we explicitly catch it and pass a 404 AppError to the global handler.
  */
-app.all('*', (req, res, next) => {
+app.use((req, res, next) => {
   next(new AppError(404, `Can't find ${req.originalUrl} on this server!`));
 });
 

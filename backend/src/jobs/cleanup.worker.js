@@ -1,6 +1,6 @@
 import { Worker } from 'bullmq';
 import { redis } from '../infra/cache/redis.js';
-import { logger } from '../infra/logger/index.js';
+import logger from '../infra/logger/index.js';
 import { prisma } from '../infra/db/prisma.js';
 
 export const startCleanupWorker = () => {

@@ -1,6 +1,6 @@
 import { Worker } from 'bullmq';
 import { redis } from '../infra/cache/redis.js';
-import { logger } from '../infra/logger/index.js';
+import logger from '../infra/logger/index.js';
 
 export const startInvoiceWorker = () => {
   const worker = new Worker('invoice-queue', async (job) => {

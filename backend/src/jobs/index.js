@@ -1,4 +1,4 @@
-import { logger } from '../infra/logger/index.js';
+import logger from '../infra/logger/index.js';
 
 import { startEmailWorker } from './email.worker.js';
 import { startInvoiceWorker } from './invoice.worker.js';
