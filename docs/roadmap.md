@@ -137,19 +137,19 @@ Stable DB schema.
 Infra before business logic.
 
 ### Tasks
-- Logger (Pino)
-- Error handling
-- Response helpers
-- Joi validation
-- Auth middleware
-- Rate limiting
-- Helmet
-- CORS
-- Redis setup
-- Cache helpers
-- S3 config
-- Queue setup (BullMQ)
-- Base worker setup
+- [x] Logger (Pino)
+- [x] Error handling
+- [x] Response helpers
+- [x] Joi validation
+- [x] Auth middleware
+- [x] Rate limiting
+- [x] Helmet
+- [x] CORS
+- [x] Redis setup
+- [x] Cache helpers
+- [x] S3 config
+- [x] Queue setup (BullMQ)
+- [x] Base worker setup
 
 ### Deliverable
 Core backend infra.
