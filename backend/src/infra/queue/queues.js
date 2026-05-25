@@ -27,3 +27,4 @@ export const invoiceQueue = createQueue('invoice-queue');
 export const exportQueue = createQueue('export-queue');
 export const cleanupQueue = createQueue('cleanup-queue');
 export const reminderQueue = createQueue('reminder-queue');
+export const webhookQueue = createQueue('webhook-queue');

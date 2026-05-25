@@ -52,6 +52,18 @@ app.use('/api', apiLimiter);
  */
 app.use(httpLogger);
 
+import promBundle from 'express-prom-bundle';
+const metricsMiddleware = promBundle({
+  includeMethod: true,
+  includePath: true,
+  includeStatusCode: true,
+  includeUp: true,
+  promClient: {
+    collectDefaultMetrics: {}
+  }
+});
+app.use(metricsMiddleware);
+
 /**
  * ------------------------------------------------------------------------
  * 4. Stripe Webhook (Must precede express.json)

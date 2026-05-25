@@ -5,6 +5,7 @@ import { startInvoiceWorker } from './invoice.worker.js';
 import { startExportWorker } from './export.worker.js';
 import { startCleanupWorker } from './cleanup.worker.js';
 import { startReminderWorker } from './reminder.worker.js';
+import { startWebhookWorker } from './webhook.worker.js';
 
 export const startAllWorkers = () => {
   logger.info('[Jobs] Starting BullMQ workers...');
@@ -14,6 +15,7 @@ export const startAllWorkers = () => {
   startExportWorker();
   startCleanupWorker();
   startReminderWorker();
+  startWebhookWorker();
 
   logger.info('[Jobs] All workers started successfully');
 };

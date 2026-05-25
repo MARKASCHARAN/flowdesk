@@ -12,7 +12,7 @@ export const auditExtension = (basePrisma) => basePrisma.$extends({
     $allModels: {
       async update({ model, operation, args, query }) {
         const store = requestContext?.getStore();
-        const userId = store?.get('userId');
+        const userId = store?.get('userId') || null;
         const tenantId = store?.get('tenantId');
 
         // Do not audit internal tables or if no context is present (like background jobs)
@@ -61,7 +61,7 @@ export const auditExtension = (basePrisma) => basePrisma.$extends({
 
       async delete({ model, operation, args, query }) {
         const store = requestContext?.getStore();
-        const userId = store?.get('userId');
+        const userId = store?.get('userId') || null;
         const tenantId = store?.get('tenantId');
 
         if (!userId || !tenantId || ['AuditLog', 'Session', 'Notification', 'WebhookEvent'].includes(model)) {

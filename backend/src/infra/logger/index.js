@@ -17,8 +17,13 @@ const logger = pino({
       : undefined,
 });
 
+import crypto from 'crypto';
+
 export const httpLogger = pinoHttp({
   logger,
+  genReqId: function (req) {
+    return req.headers['x-request-id'] || crypto.randomUUID();
+  },
   customLogLevel: function (req, res, err) {
     if (res.statusCode >= 400 && res.statusCode < 500) {
       return 'warn';

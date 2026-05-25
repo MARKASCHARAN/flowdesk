@@ -23,6 +23,11 @@ export const ticketsService = {
 
     auditLogsService.logEvent(tenantId, createdBy, 'create', 'Ticket', ticket.id, { title: ticket.title });
 
+    // Trigger Outgoing Webhook
+    import('../../webhooks/services/webhook.service.js').then(({ webhookService }) => {
+      webhookService.dispatchEvent(tenantId, 'ticket.created', { ticketId: ticket.id, title: ticket.title, priority: ticket.priority });
+    });
+
     return ticket;
   },
 
