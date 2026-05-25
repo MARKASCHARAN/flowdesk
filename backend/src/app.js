@@ -12,6 +12,8 @@ import { tenantsRoutes } from './modules/tenants/index.js';
 import { rbacRoutes } from './modules/rbac/index.js';
 import { crmRoutes } from './modules/crm/index.js';
 import { ticketsRoutes } from './modules/tickets/index.js';
+import { commentsRoutes } from './modules/comments/index.js';
+import { notificationsRoutes } from './modules/notifications/index.js';
 
 const app = express();
 
@@ -77,6 +79,8 @@ app.use('/api/v1/tenants', tenantsRoutes);
 app.use('/api/v1/rbac', rbacRoutes);
 app.use('/api/v1/crm', crmRoutes);
 app.use('/api/v1/tickets', ticketsRoutes);
+app.use('/api/v1/comments', commentsRoutes);
+app.use('/api/v1/notifications', notificationsRoutes);
 
 /**
  * ------------------------------------------------------------------------
