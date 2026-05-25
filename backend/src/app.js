@@ -14,6 +14,7 @@ import { crmRoutes } from './modules/crm/index.js';
 import { ticketsRoutes } from './modules/tickets/index.js';
 import { commentsRoutes } from './modules/comments/index.js';
 import { notificationsRoutes } from './modules/notifications/index.js';
+import { attachmentsRoutes } from './modules/attachments/index.js';
 
 const app = express();
 
@@ -81,6 +82,7 @@ app.use('/api/v1/crm', crmRoutes);
 app.use('/api/v1/tickets', ticketsRoutes);
 app.use('/api/v1/comments', commentsRoutes);
 app.use('/api/v1/notifications', notificationsRoutes);
+app.use('/api/v1/attachments', attachmentsRoutes);
 
 /**
  * ------------------------------------------------------------------------
