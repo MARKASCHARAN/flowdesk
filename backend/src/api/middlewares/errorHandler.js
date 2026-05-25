@@ -40,8 +40,11 @@ export const errorHandler = (err, req, res, next) => {
   } else if (!error.isOperational) {
     // In production, mask the message of unknown internal server errors 
     // to avoid leaking database schemas or internal directory structures.
-    response.message = 'Internal Server Error';
-    logger.error(error);
+    console.error('ERROR 💥', err);
+    return res.status(500).json({
+      status: 'error',
+      message: 'Something went very wrong',
+    });
   }
 
   res.status(statusCode).json(response);

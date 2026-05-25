@@ -2,6 +2,7 @@ import { ticketsRepository } from '../repositories/tickets.repository.js';
 import { AppError } from '../../../infra/errors/AppError.js';
 import { uploadFileToS3 } from '../../../infra/storage/s3.js';
 import { getSocketServer } from '../../../infra/websocket/socket.js';
+import { auditLogsService } from '../../audit-logs/services/auditLogs.service.js';
 import crypto from 'crypto';
 import path from 'path';
 
@@ -12,13 +13,17 @@ export const ticketsService = {
       ...data,
       status: 'open', // Default status
     };
-    const newTicket = await ticketsRepository.createTicket(tenantId, createdBy, ticketData);
+    const ticket = await ticketsRepository.createTicket(tenantId, createdBy, ticketData);
     
     // Alert online tenant admins/agents
     const io = getSocketServer();
-    io.to(`tenant_${tenantId}`).emit('ticket:created', newTicket);
+    if (io) {
+      io.to(`tenant_${tenantId}`).emit('ticket:created', ticket);
+    }
 
-    return newTicket;
+    auditLogsService.logEvent(tenantId, createdBy, 'create', 'Ticket', ticket.id, { title: ticket.title });
+
+    return ticket;
   },
 
   async getTickets(tenantId, options) {
@@ -45,7 +50,9 @@ export const ticketsService = {
 
     // Broadcast update to anyone viewing the ticket
     const io = getSocketServer();
-    io.to(`ticket_${id}`).emit('ticket:updated', ticket);
+    if (io) {
+      io.to(`ticket_${id}`).emit('ticket:updated', ticket);
+    }
 
     return ticket;
   },

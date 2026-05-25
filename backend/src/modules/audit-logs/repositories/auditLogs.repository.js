@@ -7,7 +7,7 @@ export const auditLogsRepository = {
         tenantId,
         userId,
         action,
-        resource,
+        resourceType: resource,
         resourceId,
         metadata: metadata || {}
       }
@@ -20,7 +20,7 @@ export const auditLogsRepository = {
       tenantId,
       ...(userId && { userId }),
       ...(action && { action }),
-      ...(resource && { resource }),
+      ...(resource && { resourceType: resource }),
     };
 
     const [logs, total] = await Promise.all([

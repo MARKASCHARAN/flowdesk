@@ -53,7 +53,20 @@ app.use(httpLogger);
 
 /**
  * ------------------------------------------------------------------------
- * 4. Body Parsers
+ * 4. Stripe Webhook (Must precede express.json)
+ * ------------------------------------------------------------------------
+ * Industry standard: Stripe requires the raw, unparsed request body to verify the signature.
+ */
+import { billingController } from './modules/billing/controllers/billing.controller.js';
+app.post(
+  '/api/v1/billing/webhook',
+  express.raw({ type: 'application/json' }),
+  billingController.webhook
+);
+
+/**
+ * ------------------------------------------------------------------------
+ * 5. Body Parsers
  * ------------------------------------------------------------------------
  * Industry standard: Parse incoming JSON payloads and URL-encoded data.
  */
@@ -87,6 +100,8 @@ app.use('/api/v1/notifications', notificationsRoutes);
 app.use('/api/v1/attachments', attachmentsRoutes);
 app.use('/api/v1/search', searchRoutes);
 app.use('/api/v1/audit-logs', auditLogsRoutes);
+import { billingRoutes } from './modules/billing/index.js';
+app.use('/api/v1/billing', billingRoutes);
 
 /**
  * ------------------------------------------------------------------------

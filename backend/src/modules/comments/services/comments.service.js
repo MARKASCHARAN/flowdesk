@@ -18,7 +18,9 @@ export const commentsService = {
 
     // Broadcast the new comment to everyone viewing this ticket
     const io = getSocketServer();
-    io.to(`ticket_${ticketId}`).emit('comment:new', newComment);
+    if (io) {
+      io.to(`ticket_${ticketId}`).emit('comment:new', newComment);
+    }
 
     return newComment;
   },

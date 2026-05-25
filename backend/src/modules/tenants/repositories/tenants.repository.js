@@ -2,8 +2,8 @@ import { prisma } from '../../../infra/db/prisma.js';
 
 export const tenantsRepository = {
   async findById(id) {
-    return prisma.tenant.findUnique({
-      where: { id, deletedAt: null },
+    return prisma.tenant.findFirst({
+      where: { id },
     });
   },
 

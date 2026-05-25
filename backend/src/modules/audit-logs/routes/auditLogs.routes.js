@@ -4,7 +4,7 @@ import { auditLogsValidation } from '../validations/auditLogs.validation.js';
 import { validate } from '../../../api/middlewares/validate.js';
 import { requireAuth } from '../../../api/middlewares/auth.js';
 import { requireTenant } from '../../../api/middlewares/tenant.js';
-import { requireRole } from '../../../api/middlewares/rbac.js';
+import { requireRole } from '../../../api/middlewares/role.js';
 
 const router = Router();
 

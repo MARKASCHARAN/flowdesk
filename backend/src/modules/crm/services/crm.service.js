@@ -1,11 +1,17 @@
 import { crmRepository } from '../repositories/crm.repository.js';
 import { AppError } from '../../../infra/errors/AppError.js';
+import { prisma } from '../../../infra/db/prisma.js';
+import { auditLogsService } from '../../audit-logs/services/auditLogs.service.js';
 
 export const crmService = {
   // --- Customers ---
-  async createCustomer(tenantId, data) {
+  async createCustomer(tenantId, userId, data) {
     try {
-      return await crmRepository.createCustomer(tenantId, data);
+      const customer = await crmRepository.createCustomer(tenantId, data);
+    
+      auditLogsService.logEvent(tenantId, userId, 'create', 'Customer', customer.id, { email: customer.email });
+
+      return customer;
     } catch (error) {
       if (error.code === 'P2002') {
         throw new AppError(400, 'A customer with this email already exists');

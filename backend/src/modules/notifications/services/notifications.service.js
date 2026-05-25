@@ -10,7 +10,9 @@ export const notificationsService = {
 
     // Push the notification in real-time to the targeted user's personal room
     const io = getSocketServer();
-    io.to(`user_${userId}`).emit('notification:new', notification);
+    if (io) {
+      io.to(`user_${userId}`).emit('notification:new', notification);
+    }
 
     return notification;
   },

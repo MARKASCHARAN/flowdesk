@@ -5,7 +5,7 @@ export const crmController = {
   // --- Customers ---
   async createCustomer(req, res, next) {
     try {
-      const customer = await crmService.createCustomer(res.locals.tenantId, req.body);
+      const customer = await crmService.createCustomer(res.locals.tenantId, res.locals.userId, req.body);
       sendResponse(res, 201, customer, 'Customer created successfully');
     } catch (error) {
       next(error);

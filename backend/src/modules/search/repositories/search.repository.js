@@ -5,7 +5,7 @@ export const searchRepository = {
     // Perform a naive parallel search across Customers, Leads, and Tickets
     // In production, you'd use Elasticsearch, MeiliSearch, or Postgres Full Text Search
     
-    const [customers, leads, tickets] = await Promise.all([
+    const [customers, tickets] = await Promise.all([
       prisma.customer.findMany({
         where: {
           tenantId,
@@ -18,19 +18,6 @@ export const searchRepository = {
         },
         take,
         select: { id: true, name: true, email: true, company: true }
-      }),
-      prisma.lead.findMany({
-        where: {
-          tenantId,
-          deletedAt: null,
-          OR: [
-            { title: { contains: query, mode: 'insensitive' } },
-            { company: { contains: query, mode: 'insensitive' } },
-            { contactName: { contains: query, mode: 'insensitive' } }
-          ]
-        },
-        take,
-        select: { id: true, title: true, company: true, contactName: true, status: true }
       }),
       prisma.ticket.findMany({
         where: {
@@ -46,6 +33,6 @@ export const searchRepository = {
       })
     ]);
 
-    return { customers, leads, tickets };
+    return { customers, tickets };
   }
 };

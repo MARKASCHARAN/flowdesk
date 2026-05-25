@@ -19,9 +19,11 @@ export const generateTokens = (user) => {
     expiresIn: config.jwt.expiresIn, // e.g., '1h'
   });
 
-  const refreshToken = jwt.sign({ id: user.id }, config.jwt.secret, {
-    expiresIn: '7d',
-  });
+  const refreshToken = jwt.sign(
+    { id: user.id, jti: crypto.randomUUID() }, 
+    config.jwt.secret, 
+    { expiresIn: '7d' }
+  );
 
   return { accessToken, refreshToken };
 };

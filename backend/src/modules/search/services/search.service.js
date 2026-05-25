@@ -9,6 +9,6 @@ export const searchService = {
     
     // We can implement caching via Redis here to prevent hammering DB on frequent searches
     
-    return searchRepository.searchGlobal(tenantId, query, 0, limit);
+    return searchRepository.searchGlobal(tenantId, query, limit);
   }
 };
