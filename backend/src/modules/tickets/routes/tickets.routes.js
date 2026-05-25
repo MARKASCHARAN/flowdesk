@@ -15,5 +15,6 @@ router.get('/', validate(ticketsValidation.listQuery), ticketsController.getTick
 router.get('/:id', validate(ticketsValidation.paramId), ticketsController.getTicketById);
 router.patch('/:id', validate(ticketsValidation.updateTicket), ticketsController.updateTicket);
 router.delete('/:id', validate(ticketsValidation.paramId), ticketsController.deleteTicket);
+router.post('/:id/restore', validate(ticketsValidation.paramId), ticketsController.restoreTicket);
 
 export default router;

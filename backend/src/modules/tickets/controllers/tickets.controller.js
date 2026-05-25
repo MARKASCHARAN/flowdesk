@@ -13,13 +13,12 @@ export const ticketsController = {
 
   async getTickets(req, res, next) {
     try {
-      const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
-      const skip = (page - 1) * limit;
+      const cursor = req.query.cursor;
 
-      const { tickets, total } = await ticketsService.getTickets(res.locals.tenantId, {
-        skip,
+      const { tickets, nextCursor, total } = await ticketsService.getTickets(res.locals.tenantId, {
         take: limit,
+        cursor,
         search: req.query.search,
         status: req.query.status,
         priority: req.query.priority,
@@ -29,7 +28,11 @@ export const ticketsController = {
       
       sendResponse(res, 200, {
         tickets,
-        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
+        pagination: { 
+          nextCursor, 
+          limit, 
+          total 
+        }
       });
     } catch (error) {
       next(error);
@@ -58,6 +61,15 @@ export const ticketsController = {
     try {
       await ticketsService.deleteTicket(req.params.id, res.locals.tenantId);
       sendResponse(res, 200, null, 'Ticket deleted successfully');
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async restoreTicket(req, res, next) {
+    try {
+      const ticket = await ticketsService.restoreTicket(req.params.id, res.locals.tenantId);
+      sendResponse(res, 200, ticket, 'Ticket restored successfully');
     } catch (error) {
       next(error);
     }

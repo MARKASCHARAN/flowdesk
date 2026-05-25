@@ -60,5 +60,11 @@ export const ticketsService = {
   async deleteTicket(id, tenantId) {
     const ticket = await ticketsRepository.deleteTicket(id, tenantId);
     if (!ticket) throw new AppError(404, 'Ticket not found');
+  },
+
+  async restoreTicket(id, tenantId) {
+    const ticket = await ticketsRepository.restoreTicket(id, tenantId);
+    if (!ticket) throw new AppError(404, 'Ticket not found or not deleted');
+    return ticket;
   }
 };

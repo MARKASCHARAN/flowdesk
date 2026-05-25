@@ -12,7 +12,7 @@ export const ticketsRepository = {
   },
 
   async findTickets(tenantId, options = {}) {
-    const { skip = 0, take = 10, status, priority, assigneeId, customerId, search } = options;
+    const { take = 10, cursor, status, priority, assigneeId, customerId, search } = options;
     const where = {
       tenantId,
       deletedAt: null,
@@ -27,23 +27,37 @@ export const ticketsRepository = {
       }),
     };
 
-    const [tickets, total] = await Promise.all([
-      prisma.ticket.findMany({
-        where,
-        skip,
-        take,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          customer: { select: { id: true, name: true, company: true } },
-          assignee: { select: { id: true, name: true, avatarUrl: true } },
-          creator: { select: { id: true, name: true } },
-          _count: { select: { comments: true, attachments: true } }
-        }
-      }),
+    const query = {
+      where,
+      take: take + 1, // Fetch one extra to check if there is a next page
+      orderBy: { createdAt: 'desc' },
+      include: {
+        customer: { select: { id: true, name: true, company: true } },
+        assignee: { select: { id: true, name: true, avatarUrl: true } },
+        creator: { select: { id: true, name: true } },
+        _count: { select: { comments: true, attachments: true } }
+      }
+    };
+
+    if (cursor) {
+      query.cursor = { id: cursor };
+      query.skip = 1; // Skip the cursor itself
+    }
+
+    const [ticketsRaw, total] = await Promise.all([
+      prisma.ticket.findMany(query),
       prisma.ticket.count({ where }),
     ]);
 
-    return { tickets, total };
+    let nextCursor = null;
+    if (ticketsRaw.length > take) {
+      const nextItem = ticketsRaw.pop();
+      nextCursor = ticketsRaw[ticketsRaw.length - 1].id; // Set cursor to the last valid item
+    } else if (ticketsRaw.length > 0) {
+      nextCursor = null; // No more items
+    }
+
+    return { tickets: ticketsRaw, nextCursor, total };
   },
 
   async findTicketById(id, tenantId) {
@@ -78,5 +92,11 @@ export const ticketsRepository = {
     const ticket = await prisma.ticket.findFirst({ where: { id, tenantId, deletedAt: null } });
     if (!ticket) return null;
     return prisma.ticket.update({ where: { id }, data: { deletedAt: new Date() } });
+  },
+
+  async restoreTicket(id, tenantId) {
+    const ticket = await prisma.ticket.findFirst({ where: { id, tenantId, deletedAt: { not: null } } });
+    if (!ticket) return null;
+    return prisma.ticket.update({ where: { id }, data: { deletedAt: null } });
   }
 };
