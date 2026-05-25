@@ -2,10 +2,11 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import { httpLogger } from './infra/logger/index.js';
-import { apiLimiter } from './infra/middlewares/rateLimiter.js';
-import { errorHandler } from './infra/middlewares/errorHandler.js';
+import { apiLimiter } from './api/middlewares/rateLimiter.js';
+import { errorHandler } from './api/middlewares/errorHandler.js';
 import { AppError } from './infra/errors/AppError.js';
 import { config } from './infra/config/env.js';
+import { authRoutes } from './modules/auth/index.js';
 
 const app = express();
 
@@ -64,9 +65,8 @@ app.get('/health', (req, res) => {
  * ------------------------------------------------------------------------
  * 6. API Routes Mounting
  * ------------------------------------------------------------------------
- * (Placeholder for Phase 4 & Phase 5 Business Logic Modules)
  */
-// app.use('/api/v1', apiRoutes);
+app.use('/api/v1/auth', authRoutes);
 
 /**
  * ------------------------------------------------------------------------
