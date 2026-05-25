@@ -22,3 +22,18 @@ export const requireRole = (allowedRoles) => {
     next();
   };
 };
+
+export const requireSystemAdmin = (req, res, next) => {
+  if (!req.user || !req.user.roles || req.user.roles.length === 0) {
+    return next(new AppError(403, 'Forbidden: No roles assigned'));
+  }
+
+  // SystemAdmin check (e.g. user has SystemAdmin role or super admin flag)
+  // For this boilerplate, we'll assume a role of 'SystemAdmin'
+  const hasRole = req.user.roles.some((role) => role === 'SystemAdmin');
+  if (!hasRole) {
+    return next(new AppError(403, 'Forbidden: System Admin permissions required'));
+  }
+
+  next();
+};

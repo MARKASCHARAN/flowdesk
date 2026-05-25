@@ -103,6 +103,15 @@ app.use('/api/v1/audit-logs', auditLogsRoutes);
 import { billingRoutes } from './modules/billing/index.js';
 app.use('/api/v1/billing', billingRoutes);
 
+import { analyticsRoutes } from './modules/analytics/index.js';
+app.use('/api/v1/analytics', analyticsRoutes);
+
+import { reportingRoutes } from './modules/reporting/index.js';
+app.use('/api/v1/reports', reportingRoutes);
+
+import { adminRoutes } from './modules/admin/index.js';
+app.use('/api/v1/admin', adminRoutes);
+
 /**
  * ------------------------------------------------------------------------
  * 7. Catch-All 404 Handler
