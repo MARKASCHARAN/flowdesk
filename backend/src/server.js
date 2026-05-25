@@ -1,10 +1,7 @@
 import app from './app.js';
 import { config } from './infra/config/env.js';
 import logger from './infra/logger/index.js';
-
-import app from './app.js';
-import { config } from './infra/config/env.js';
-import logger from './infra/logger/index.js';
+import { startAllWorkers } from './infra/queue/index.js';
 
 /**
  * Handle Uncaught Exceptions
@@ -26,6 +23,9 @@ process.on('uncaughtException', (err) => {
  */
 const server = app.listen(config.port, () => {
   logger.info(`Server running in ${config.env} mode on port ${config.port}`);
+  
+  // Initialize Background Queue Workers
+  startAllWorkers();
 });
 
 /**
