@@ -8,6 +8,7 @@ import { AppError } from './infra/errors/AppError.js';
 import { config } from './infra/config/env.js';
 import { authRoutes } from './modules/auth/index.js';
 import { usersRoutes } from './modules/users/index.js';
+import { tenantsRoutes } from './modules/tenants/index.js';
 
 const app = express();
 
@@ -69,6 +70,7 @@ app.get('/health', (req, res) => {
  */
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', usersRoutes);
+app.use('/api/v1/tenants', tenantsRoutes);
 
 /**
  * ------------------------------------------------------------------------
