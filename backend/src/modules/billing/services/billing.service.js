@@ -1,6 +1,7 @@
 import { billingRepository } from '../repositories/billing.repository.js';
 import { stripeService } from './stripe.service.js';
 import { config } from '../../../infra/config/env.js';
+import logger from '../../../infra/logger/index.js';
 import { AppError } from '../../../infra/errors/AppError.js';
 import { auditLogsService } from '../../audit-logs/services/auditLogs.service.js';
 
@@ -62,7 +63,7 @@ export const billingService = {
     }
 
     const event = stripeService.verifyWebhookSignature(rawBody, signature, webhookSecret);
-    console.log('WEBHOOK EVENT:', event);
+    logger.debug(`WEBHOOK EVENT: ${event.type}`);
 
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -70,9 +71,9 @@ export const billingService = {
         const tenantId = session.client_reference_id;
         if (tenantId) {
           // Grant Premium access
-          console.log('UPDATING TENANT PLAN FOR:', tenantId);
+          logger.info(`UPDATING TENANT PLAN FOR: ${tenantId}`);
           const updated = await billingRepository.updateTenantPlan(tenantId, 'premium');
-          console.log('UPDATED TENANT:', updated);
+          logger.debug(`UPDATED TENANT: ${updated.id}`);
           
           await billingRepository.createSubscription({
             tenantId,

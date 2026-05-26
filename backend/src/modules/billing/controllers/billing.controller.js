@@ -1,5 +1,6 @@
 import { billingService } from '../services/billing.service.js';
 import { sendResponse } from '../../../infra/utils/response.js';
+import logger from '../../../infra/logger/index.js';
 
 export const billingController = {
   async getSubscription(req, res, next) {
@@ -44,7 +45,7 @@ export const billingController = {
     try {
       // Stripe requires the raw body and the stripe signature header
       const signature = req.headers['stripe-signature'];
-      console.log('Webhook Debug req.body:', Buffer.isBuffer(req.body) ? 'Buffer' : typeof req.body, req.body.toString());
+      logger.debug(`Webhook Debug req.body: ${Buffer.isBuffer(req.body) ? 'Buffer' : typeof req.body}`);
       await billingService.handleStripeWebhook(req.body, signature);
       
       res.status(200).send({ received: true });

@@ -1,0 +1,271 @@
+{
+  "info": {
+    "name": "FlowDesk API (Full Collection)",
+    "description": "Complete Postman Collection for all FlowDesk Modules",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api/v1", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "customerId", "value": "", "type": "string" },
+    { "key": "ticketId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.data && jsonData.data.accessToken) {",
+                  "    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Admin\",\n  \"email\": \"admin@startup.com\",\n  \"password\": \"StrongPassword123!\",\n  \"companyName\": \"Startup Inc\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.data && jsonData.data.accessToken) {",
+                  "    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@startup.com\",\n  \"password\": \"StrongPassword123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. CRM",
+      "item": [
+        {
+          "name": "Create Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.data && jsonData.data.id) {",
+                  "    pm.collectionVariables.set(\"customerId\", jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Corp\",\n  \"email\": \"contact@acme.com\",\n  \"phone\": \"+1234567890\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/crm/customers", "host": ["{{baseUrl}}"], "path": ["crm", "customers"] }
+          }
+        },
+        {
+          "name": "Get Customers",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/crm/customers", "host": ["{{baseUrl}}"], "path": ["crm", "customers"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Tickets",
+      "item": [
+        {
+          "name": "Create Ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.data && jsonData.data.id) {",
+                  "    pm.collectionVariables.set(\"ticketId\", jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"title\": \"Login not working\",\n  \"description\": \"I cannot login to my account.\",\n  \"priority\": \"high\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/tickets", "host": ["{{baseUrl}}"], "path": ["tickets"] }
+          }
+        },
+        {
+          "name": "Get Tickets",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/tickets", "host": ["{{baseUrl}}"], "path": ["tickets"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Comments",
+      "item": [
+        {
+          "name": "Add Comment to Ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"We are looking into this issue right now.\",\n  \"isInternal\": false\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/comments/ticket/{{ticketId}}", "host": ["{{baseUrl}}"], "path": ["comments", "ticket", "{{ticketId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Search",
+      "item": [
+        {
+          "name": "Global Search",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/search/global?q=Login", "host": ["{{baseUrl}}"], "path": ["search", "global"], "query": [{"key": "q", "value": "Login"}] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Analytics & Reports",
+      "item": [
+        {
+          "name": "Get Dashboard Metrics",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/analytics/dashboard", "host": ["{{baseUrl}}"], "path": ["analytics", "dashboard"] }
+          }
+        },
+        {
+          "name": "Request Export (CSV)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"tickets\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/reports/export", "host": ["{{baseUrl}}"], "path": ["reports", "export"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Billing",
+      "item": [
+        {
+          "name": "Get Subscription",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/billing/subscription", "host": ["{{baseUrl}}"], "path": ["billing", "subscription"] }
+          }
+        },
+        {
+          "name": "Create Checkout Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"priceId\": \"price_mock_123\",\n  \"frontendUrl\": \"http://localhost:3000\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/billing/checkout", "host": ["{{baseUrl}}"], "path": ["billing", "checkout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Admin",
+      "item": [
+        {
+          "name": "List All Tenants (SuperAdmin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/tenants", "host": ["{{baseUrl}}"], "path": ["admin", "tenants"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Audit Logs",
+      "item": [
+        {
+          "name": "Get Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/audit-logs", "host": ["{{baseUrl}}"], "path": ["audit-logs"] }
+          }
+        }
+      ]
+    }
+  ]
+}
