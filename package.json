@@ -16,5 +16,8 @@
   "devDependencies": {
     "husky": "^9.1.7",
     "prettier": "^3.8.3"
+  },
+  "overrides": {
+    "tailwindcss": "3.4.19"
   }
 }

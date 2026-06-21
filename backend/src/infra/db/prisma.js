@@ -1,7 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import prismaPkg from '@prisma/client';
+const { PrismaClient } = prismaPkg;
 import { PrismaPg } from '@prisma/adapter-pg';
-import pkg from 'pg';
-const { Pool } = pkg;
+import pgPkg from 'pg';
+const { Pool } = pgPkg;
 import { config } from '../../infra/config/env.js';
 import logger from '../../infra/logger/index.js';
 
