@@ -14,6 +14,19 @@ export const billingController = {
     }
   },
 
+  async getInvoices(req, res, next) {
+    try {
+      // Mocked for now, in reality fetch from Stripe or local DB
+      const mockInvoices = [
+        { id: 'INV-1001', invoiceNumber: 'INV-1001', plan: 'Professional Plan', date: '10/24/2023', amount: '$299.00', total: 29900, status: 'Paid', pdfUrl: '#' },
+        { id: 'INV-1000', invoiceNumber: 'INV-1000', plan: 'Professional Plan', date: '09/24/2023', amount: '$299.00', total: 29900, status: 'Paid', pdfUrl: '#' },
+      ];
+      sendResponse(res, 200, mockInvoices, 'Invoices retrieved');
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async checkout(req, res, next) {
     try {
       const { priceId, frontendUrl } = req.body;

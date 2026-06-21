@@ -22,7 +22,7 @@ export const ticketsService = {
     return api.delete(`/tickets/${id}`);
   },
 
-  restoreTicket: async (id) => {
-    return api.post(`/tickets/${id}/restore`);
+  assignTicket: async (id, assigneeId) => {
+    return api.post(`/tickets/${id}/assign`, { assigneeId });
   }
 };

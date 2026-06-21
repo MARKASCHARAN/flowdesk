@@ -9,6 +9,14 @@ export const usersService = {
     return api.patch('/users/me', data);
   },
 
+  getTeam: async () => {
+    return api.get('/users/team');
+  },
+
+  updateStatus: async (id, status) => {
+    return api.patch(`/users/${id}/status`, { status });
+  },
+
   // Requires multipart/form-data for image upload
   uploadAvatar: async (file) => {
     const formData = new FormData();
