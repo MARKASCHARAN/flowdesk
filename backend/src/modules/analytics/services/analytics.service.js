@@ -10,14 +10,14 @@ export const analyticsService = {
     const [totalTickets, openTickets, totalCustomers] = await Promise.all([
       analyticsRepository.countTickets(tenantId),
       analyticsRepository.countTicketsByStatus(tenantId, 'open'),
-      analyticsRepository.countCustomers(tenantId)
+      analyticsRepository.countCustomers(tenantId),
     ]);
 
     const metrics = {
       totalTickets,
       openTickets,
       resolvedTickets: totalTickets - openTickets,
-      totalCustomers
+      totalCustomers,
     };
 
     // Cache for 5 minutes
@@ -31,9 +31,9 @@ export const analyticsService = {
     if (cached) return JSON.parse(cached);
 
     const trends = await analyticsRepository.getTicketTrends(tenantId);
-    
+
     // Cache for 5 minutes
     await redis.setex(cacheKey, 300, JSON.stringify(trends));
     return trends;
-  }
+  },
 };

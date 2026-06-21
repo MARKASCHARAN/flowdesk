@@ -2,10 +2,13 @@ import joi from 'joi';
 
 export const usersValidation = {
   updateProfile: {
-    body: joi.object().keys({
-      name: joi.string(),
-      phone: joi.string().allow('', null),
-    }).min(1),
+    body: joi
+      .object()
+      .keys({
+        name: joi.string(),
+        phone: joi.string().allow('', null),
+      })
+      .min(1),
   },
   updateStatus: {
     params: joi.object().keys({
@@ -21,5 +24,5 @@ export const usersValidation = {
       limit: joi.number().integer().min(1).max(100).default(10),
       search: joi.string().allow(''),
     }),
-  }
+  },
 };

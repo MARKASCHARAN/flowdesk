@@ -9,7 +9,7 @@ import { startWebhookWorker } from './webhook.worker.js';
 
 export const startAllWorkers = () => {
   logger.info('[Jobs] Starting BullMQ workers...');
-  
+
   startEmailWorker();
   startInvoiceWorker();
   startExportWorker();

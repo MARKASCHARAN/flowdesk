@@ -10,19 +10,17 @@ let ticketId;
 
 describe('FlowDesk End-to-End API Flow', () => {
   it('1. Should register a new company (Auth)', async () => {
-    const res = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        name: 'Test Admin',
-        email: 'testadmin@company.com',
-        password: 'password123',
-        companyName: 'Test Company LLC'
-      });
+    const res = await request(app).post('/api/v1/auth/register').send({
+      name: 'Test Admin',
+      email: 'testadmin@company.com',
+      password: 'password123',
+      companyName: 'Test Company LLC',
+    });
 
     expect(res.statusCode).toBe(201);
     expect(res.body.status).toBe('success');
     expect(res.body.data.accessToken).toBeDefined();
-    
+
     accessToken = res.body.data.accessToken;
     userId = res.body.data.user.id;
     tenantId = res.body.data.user.tenantId;
@@ -53,7 +51,7 @@ describe('FlowDesk End-to-End API Flow', () => {
       .send({
         name: 'Alice Smith',
         email: 'alice@client.com',
-        company: 'Client Co'
+        company: 'Client Co',
       });
 
     expect(res.statusCode).toBe(201);
@@ -69,7 +67,7 @@ describe('FlowDesk End-to-End API Flow', () => {
         customerId,
         title: 'System is down',
         description: 'I cannot log into the dashboard',
-        priority: 'high'
+        priority: 'high',
       });
 
     expect(res.statusCode).toBe(201);
@@ -83,7 +81,7 @@ describe('FlowDesk End-to-End API Flow', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         body: 'We are investigating this immediately.',
-        isInternal: false
+        isInternal: false,
       });
 
     expect(res.statusCode).toBe(201);
@@ -101,7 +99,7 @@ describe('FlowDesk End-to-End API Flow', () => {
   });
 
   it('8. Should verify the ticket creation was logged (Audit Logs)', async () => {
-    await new Promise(resolve => setTimeout(resolve, 100)); // wait for fire-and-forget log
+    await new Promise((resolve) => setTimeout(resolve, 100)); // wait for fire-and-forget log
 
     const res = await request(app)
       .get('/api/v1/audit-logs')
@@ -110,9 +108,11 @@ describe('FlowDesk End-to-End API Flow', () => {
     expect(res.statusCode).toBe(200);
     // There should be multiple logs (Customer created, Ticket created)
     expect(res.body.data.logs.length).toBeGreaterThan(0);
-    
+
     // One of them should be "ticket.created" or similar
-    const ticketLog = res.body.data.logs.find(l => l.resourceType === 'Ticket');
+    const ticketLog = res.body.data.logs.find(
+      (l) => l.resourceType === 'Ticket'
+    );
     expect(ticketLog).toBeDefined();
   });
 

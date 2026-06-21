@@ -10,14 +10,14 @@ describe('Notifications Module API Tests', () => {
       name: 'Notification Admin',
       email: 'notifadmin@company.com',
       password: 'password123',
-      companyName: 'Notif Co'
+      companyName: 'Notif Co',
     });
     accessToken = res.body.data.accessToken;
 
     // Simulate system generating a notification for this user
     const userId = res.body.data.user.id;
     const tenantId = res.body.data.user.tenantId;
-    
+
     await prisma.notification.create({
       data: {
         tenantId,
@@ -25,8 +25,8 @@ describe('Notifications Module API Tests', () => {
         type: 'system_alert',
         title: 'Welcome!',
         body: 'Thanks for signing up.',
-        isRead: false
-      }
+        isRead: false,
+      },
     });
   });
 
@@ -46,7 +46,7 @@ describe('Notifications Module API Tests', () => {
     const res = await request(app)
       .get('/api/v1/notifications')
       .set('Authorization', `Bearer ${accessToken}`);
-    
+
     const notifId = res.body.data.notifications[0].id;
 
     // 2. Mark as read

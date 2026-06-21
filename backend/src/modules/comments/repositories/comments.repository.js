@@ -10,8 +10,8 @@ export const commentsRepository = {
         ...data,
       },
       include: {
-        user: { select: { id: true, name: true, avatarUrl: true } }
-      }
+        user: { select: { id: true, name: true, avatarUrl: true } },
+      },
     });
   },
 
@@ -35,10 +35,12 @@ export const commentsRepository = {
           user: { select: { id: true, name: true, avatarUrl: true } },
           replies: {
             where: { deletedAt: null },
-            include: { user: { select: { id: true, name: true, avatarUrl: true } } },
-            orderBy: { createdAt: 'asc' }
-          }
-        }
+            include: {
+              user: { select: { id: true, name: true, avatarUrl: true } },
+            },
+            orderBy: { createdAt: 'asc' },
+          },
+        },
       }),
       prisma.comment.count({ where }),
     ]);
@@ -48,26 +50,30 @@ export const commentsRepository = {
 
   async updateComment(id, tenantId, userId, data) {
     // Users can only update their own comments
-    const comment = await prisma.comment.findFirst({ where: { id, tenantId, userId, deletedAt: null } });
+    const comment = await prisma.comment.findFirst({
+      where: { id, tenantId, userId, deletedAt: null },
+    });
     if (!comment) return null;
-    
-    return prisma.comment.update({ 
-      where: { id }, 
+
+    return prisma.comment.update({
+      where: { id },
       data,
       include: {
-        user: { select: { id: true, name: true, avatarUrl: true } }
-      }
+        user: { select: { id: true, name: true, avatarUrl: true } },
+      },
     });
   },
 
   async deleteComment(id, tenantId, userId) {
     // Users can only delete their own comments
-    const comment = await prisma.comment.findFirst({ where: { id, tenantId, userId, deletedAt: null } });
-    if (!comment) return null;
-    
-    return prisma.comment.update({ 
-      where: { id }, 
-      data: { deletedAt: new Date() } 
+    const comment = await prisma.comment.findFirst({
+      where: { id, tenantId, userId, deletedAt: null },
     });
-  }
+    if (!comment) return null;
+
+    return prisma.comment.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+  },
 };

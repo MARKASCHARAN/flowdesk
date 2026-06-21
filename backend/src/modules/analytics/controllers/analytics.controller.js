@@ -19,5 +19,5 @@ export const analyticsController = {
     } catch (error) {
       next(error);
     }
-  }
+  },
 };

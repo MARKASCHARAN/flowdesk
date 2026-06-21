@@ -11,10 +11,10 @@ export const sendError = (res, statusCode, message, errors = []) => {
     status: 'error',
     message,
   };
-  
+
   if (errors && errors.length > 0) {
     response.errors = errors;
   }
-  
+
   res.status(statusCode).json(response);
 };

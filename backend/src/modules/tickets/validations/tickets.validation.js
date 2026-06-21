@@ -6,7 +6,10 @@ export const ticketsValidation = {
       customerId: joi.string().uuid().required(),
       title: joi.string().required(),
       description: joi.string().required(),
-      priority: joi.string().valid('low', 'medium', 'high', 'critical').required(),
+      priority: joi
+        .string()
+        .valid('low', 'medium', 'high', 'critical')
+        .required(),
       category: joi.string().allow('', null),
       assigneeId: joi.string().uuid().allow(null),
     }),
@@ -15,22 +18,31 @@ export const ticketsValidation = {
     params: joi.object().keys({
       id: joi.string().uuid().required(),
     }),
-    body: joi.object().keys({
-      title: joi.string(),
-      description: joi.string(),
-      priority: joi.string().valid('low', 'medium', 'high', 'critical'),
-      status: joi.string().valid('open', 'in_progress', 'resolved', 'closed'),
-      category: joi.string().allow('', null),
-      assigneeId: joi.string().uuid().allow(null),
-    }).min(1),
+    body: joi
+      .object()
+      .keys({
+        title: joi.string(),
+        description: joi.string(),
+        priority: joi.string().valid('low', 'medium', 'high', 'critical'),
+        status: joi.string().valid('open', 'in_progress', 'resolved', 'closed'),
+        category: joi.string().allow('', null),
+        assigneeId: joi.string().uuid().allow(null),
+      })
+      .min(1),
   },
   listQuery: {
     query: joi.object().keys({
       cursor: joi.string().uuid().allow(''),
       limit: joi.number().integer().min(1).max(100).default(10),
       search: joi.string().allow(''),
-      status: joi.string().valid('open', 'in_progress', 'resolved', 'closed').allow(''),
-      priority: joi.string().valid('low', 'medium', 'high', 'critical').allow(''),
+      status: joi
+        .string()
+        .valid('open', 'in_progress', 'resolved', 'closed')
+        .allow(''),
+      priority: joi
+        .string()
+        .valid('low', 'medium', 'high', 'critical')
+        .allow(''),
       assigneeId: joi.string().uuid().allow(''),
       customerId: joi.string().uuid().allow(''),
     }),
@@ -39,5 +51,5 @@ export const ticketsValidation = {
     params: joi.object().keys({
       id: joi.string().uuid().required(),
     }),
-  }
+  },
 };

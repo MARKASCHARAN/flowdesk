@@ -13,6 +13,10 @@ router.use(requireAuth, requireTenant, requireRole(['Admin']));
 
 // Tenant Settings Management
 router.get('/', tenantsController.getTenant);
-router.patch('/', validate(tenantsValidation.updateTenant), tenantsController.updateTenant);
+router.patch(
+  '/',
+  validate(tenantsValidation.updateTenant),
+  tenantsController.updateTenant
+);
 
 export default router;

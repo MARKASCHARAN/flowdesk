@@ -13,22 +13,28 @@ describe('Comments Module API Tests', () => {
       name: 'Comment Admin',
       email: 'commentadmin@company.com',
       password: 'password123',
-      companyName: 'Comment Co'
+      companyName: 'Comment Co',
     });
     accessToken = res.body.data.accessToken;
     tenantId = res.body.data.user.tenantId;
 
-    const crmRes = await request(app).post('/api/v1/crm/customers').set('Authorization', `Bearer ${accessToken}`).send({
-      name: 'Comment Customer',
-      email: 'comment@client.com'
-    });
+    const crmRes = await request(app)
+      .post('/api/v1/crm/customers')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'Comment Customer',
+        email: 'comment@client.com',
+      });
 
-    const ticketRes = await request(app).post('/api/v1/tickets').set('Authorization', `Bearer ${accessToken}`).send({
-      customerId: crmRes.body.data.id,
-      title: 'Comment Ticket',
-      description: 'Help me',
-      priority: 'low'
-    });
+    const ticketRes = await request(app)
+      .post('/api/v1/tickets')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        customerId: crmRes.body.data.id,
+        title: 'Comment Ticket',
+        description: 'Help me',
+        priority: 'low',
+      });
     ticketId = ticketRes.body.data.id;
   });
 
@@ -38,7 +44,7 @@ describe('Comments Module API Tests', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         body: 'This is a test comment',
-        isInternal: false
+        isInternal: false,
       });
 
     expect(res.statusCode).toBe(201);
@@ -61,7 +67,7 @@ describe('Comments Module API Tests', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         body: 'Should fail',
-        isInternal: false
+        isInternal: false,
       });
 
     expect(res.statusCode).toBe(404);

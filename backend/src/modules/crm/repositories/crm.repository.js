@@ -30,7 +30,7 @@ export const crmRepository = {
         orderBy: { createdAt: 'desc' },
         include: {
           _count: { select: { leads: true, tickets: true } },
-        }
+        },
       }),
       prisma.customer.count({ where }),
     ]);
@@ -43,21 +43,31 @@ export const crmRepository = {
       where: { id, tenantId, deletedAt: null },
       include: {
         leads: { include: { assignee: { select: { name: true } } } },
-        notes: { include: { creator: { select: { name: true, avatarUrl: true } } }, orderBy: { createdAt: 'desc' } },
-      }
+        notes: {
+          include: { creator: { select: { name: true, avatarUrl: true } } },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
     });
   },
 
   async updateCustomer(id, tenantId, data) {
-    const customer = await prisma.customer.findFirst({ where: { id, tenantId, deletedAt: null } });
+    const customer = await prisma.customer.findFirst({
+      where: { id, tenantId, deletedAt: null },
+    });
     if (!customer) return null;
     return prisma.customer.update({ where: { id }, data });
   },
 
   async deleteCustomer(id, tenantId) {
-    const customer = await prisma.customer.findFirst({ where: { id, tenantId, deletedAt: null } });
+    const customer = await prisma.customer.findFirst({
+      where: { id, tenantId, deletedAt: null },
+    });
     if (!customer) return null;
-    return prisma.customer.update({ where: { id }, data: { deletedAt: new Date() } });
+    return prisma.customer.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
   },
 
   // --- Leads ---
@@ -87,7 +97,7 @@ export const crmRepository = {
         include: {
           customer: { select: { name: true, company: true } },
           assignee: { select: { name: true } },
-        }
+        },
       }),
       prisma.lead.count({ where }),
     ]);
@@ -102,11 +112,11 @@ export const crmRepository = {
         tenantId,
         customerId,
         createdBy,
-        body
+        body,
       },
       include: {
-        creator: { select: { name: true, avatarUrl: true } }
-      }
+        creator: { select: { name: true, avatarUrl: true } },
+      },
     });
-  }
+  },
 };

@@ -16,9 +16,9 @@ export const usersRepository = {
         memberships: {
           include: {
             role: {
-              select: { name: true }
-            }
-          }
+              select: { name: true },
+            },
+          },
         },
       },
     });
@@ -48,7 +48,7 @@ export const usersRepository = {
 
   async findUsersByTenant(tenantId, options = {}) {
     const { skip = 0, take = 10, search } = options;
-    
+
     const where = {
       tenantId,
       deletedAt: null,
@@ -72,8 +72,8 @@ export const usersRepository = {
           avatarUrl: true,
           status: true,
           memberships: {
-            include: { role: { select: { name: true } } }
-          }
+            include: { role: { select: { name: true } } },
+          },
         },
         orderBy: { createdAt: 'desc' },
       }),

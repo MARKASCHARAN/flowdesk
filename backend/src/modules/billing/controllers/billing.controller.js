@@ -5,7 +5,9 @@ import logger from '../../../infra/logger/index.js';
 export const billingController = {
   async getSubscription(req, res, next) {
     try {
-      const details = await billingService.getSubscriptionDetails(res.locals.tenantId);
+      const details = await billingService.getSubscriptionDetails(
+        res.locals.tenantId
+      );
       sendResponse(res, 200, details, 'Subscription details retrieved');
     } catch (error) {
       next(error);
@@ -45,13 +47,15 @@ export const billingController = {
     try {
       // Stripe requires the raw body and the stripe signature header
       const signature = req.headers['stripe-signature'];
-      logger.debug(`Webhook Debug req.body: ${Buffer.isBuffer(req.body) ? 'Buffer' : typeof req.body}`);
+      logger.debug(
+        `Webhook Debug req.body: ${Buffer.isBuffer(req.body) ? 'Buffer' : typeof req.body}`
+      );
       await billingService.handleStripeWebhook(req.body, signature);
-      
+
       res.status(200).send({ received: true });
     } catch (error) {
       // Stripe expects a 400 on webhook signature failure
       res.status(400).send(`Webhook Error: ${error.message}`);
     }
-  }
+  },
 };

@@ -5,7 +5,9 @@ import { sendResponse } from '../../../infra/utils/response.js';
 export const authController = {
   async register(req, res, next) {
     try {
-      const { user, accessToken, refreshToken } = await authService.register(req.body);
+      const { user, accessToken, refreshToken } = await authService.register(
+        req.body
+      );
 
       // Save session
       await authRepository.createSession(
@@ -18,7 +20,12 @@ export const authController = {
       // Omit password hash from response
       delete user.passwordHash;
 
-      sendResponse(res, 201, { user, accessToken, refreshToken }, 'User registered successfully');
+      sendResponse(
+        res,
+        201,
+        { user, accessToken, refreshToken },
+        'User registered successfully'
+      );
     } catch (error) {
       next(error);
     }
@@ -26,7 +33,9 @@ export const authController = {
 
   async login(req, res, next) {
     try {
-      const { user, accessToken, refreshToken } = await authService.login(req.body);
+      const { user, accessToken, refreshToken } = await authService.login(
+        req.body
+      );
 
       // Save session
       await authRepository.createSession(
@@ -38,7 +47,12 @@ export const authController = {
 
       delete user.passwordHash;
 
-      sendResponse(res, 200, { user, accessToken, refreshToken }, 'Logged in successfully');
+      sendResponse(
+        res,
+        200,
+        { user, accessToken, refreshToken },
+        'Logged in successfully'
+      );
     } catch (error) {
       next(error);
     }
@@ -87,7 +101,12 @@ export const authController = {
     try {
       await authService.forgotPassword(req.body);
       // We always send a success response to prevent email enumeration attacks
-      sendResponse(res, 200, null, 'If that email exists, a reset link has been sent');
+      sendResponse(
+        res,
+        200,
+        null,
+        'If that email exists, a reset link has been sent'
+      );
     } catch (error) {
       next(error);
     }

@@ -13,20 +13,37 @@ export const ticketsService = {
       ...data,
       status: 'open', // Default status
     };
-    const ticket = await ticketsRepository.createTicket(tenantId, createdBy, ticketData);
-    
+    const ticket = await ticketsRepository.createTicket(
+      tenantId,
+      createdBy,
+      ticketData
+    );
+
     // Alert online tenant admins/agents
     const io = getSocketServer();
     if (io) {
       io.to(`tenant_${tenantId}`).emit('ticket:created', ticket);
     }
 
-    auditLogsService.logEvent(tenantId, createdBy, 'create', 'Ticket', ticket.id, { title: ticket.title });
+    auditLogsService.logEvent(
+      tenantId,
+      createdBy,
+      'create',
+      'Ticket',
+      ticket.id,
+      { title: ticket.title }
+    );
 
     // Trigger Outgoing Webhook
-    import('../../webhooks/services/webhook.service.js').then(({ webhookService }) => {
-      webhookService.dispatchEvent(tenantId, 'ticket.created', { ticketId: ticket.id, title: ticket.title, priority: ticket.priority });
-    });
+    import('../../webhooks/services/webhook.service.js').then(
+      ({ webhookService }) => {
+        webhookService.dispatchEvent(tenantId, 'ticket.created', {
+          ticketId: ticket.id,
+          title: ticket.title,
+          priority: ticket.priority,
+        });
+      }
+    );
 
     return ticket;
   },
@@ -71,5 +88,5 @@ export const ticketsService = {
     const ticket = await ticketsRepository.restoreTicket(id, tenantId);
     if (!ticket) throw new AppError(404, 'Ticket not found or not deleted');
     return ticket;
-  }
+  },
 };

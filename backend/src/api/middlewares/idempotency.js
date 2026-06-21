@@ -4,9 +4,9 @@ import logger from '../../infra/logger/index.js';
 
 /**
  * Idempotency Middleware
- * 
- * Industry standard: Prevents duplicate execution of critical operations 
- * (like payments or subscriptions) by caching the response against a 
+ *
+ * Industry standard: Prevents duplicate execution of critical operations
+ * (like payments or subscriptions) by caching the response against a
  * client-provided Idempotency-Key.
  */
 export const idempotencyMiddleware = async (req, res, next) => {
@@ -26,7 +26,7 @@ export const idempotencyMiddleware = async (req, res, next) => {
     if (cachedResponse) {
       logger.info(`[Idempotency] Cache hit for key: ${idempotencyKey}`);
       const { statusCode, body, headers } = JSON.parse(cachedResponse);
-      
+
       if (headers) {
         for (const [key, value] of Object.entries(headers)) {
           res.setHeader(key, value);
@@ -43,12 +43,16 @@ export const idempotencyMiddleware = async (req, res, next) => {
         const responseToCache = {
           statusCode: res.statusCode,
           headers: res.getHeaders(),
-          body
+          body,
         };
         // Cache for 24 hours
-        redis.setex(redisKey, 86400, JSON.stringify(responseToCache)).catch(err => {
-          logger.error(`[Idempotency] Failed to cache response: ${err.message}`);
-        });
+        redis
+          .setex(redisKey, 86400, JSON.stringify(responseToCache))
+          .catch((err) => {
+            logger.error(
+              `[Idempotency] Failed to cache response: ${err.message}`
+            );
+          });
       }
       return originalJson(body);
     };

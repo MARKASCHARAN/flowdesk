@@ -13,12 +13,32 @@ router.use(requireAuth, requireTenant, requireRole(['Admin']));
 
 // Roles Management
 router.get('/roles', rbacController.getRoles);
-router.post('/roles', validate(rbacValidation.createRole), rbacController.createRole);
-router.patch('/roles/:id', validate(rbacValidation.updateRole), rbacController.updateRole);
-router.delete('/roles/:id', validate(rbacValidation.roleIdParam), rbacController.deleteRole);
+router.post(
+  '/roles',
+  validate(rbacValidation.createRole),
+  rbacController.createRole
+);
+router.patch(
+  '/roles/:id',
+  validate(rbacValidation.updateRole),
+  rbacController.updateRole
+);
+router.delete(
+  '/roles/:id',
+  validate(rbacValidation.roleIdParam),
+  rbacController.deleteRole
+);
 
 // Memberships Management
-router.post('/memberships/assign', validate(rbacValidation.assignRole), rbacController.assignRole);
-router.post('/memberships/unassign', validate(rbacValidation.assignRole), rbacController.unassignRole);
+router.post(
+  '/memberships/assign',
+  validate(rbacValidation.assignRole),
+  rbacController.assignRole
+);
+router.post(
+  '/memberships/unassign',
+  validate(rbacValidation.assignRole),
+  rbacController.unassignRole
+);
 
 export default router;

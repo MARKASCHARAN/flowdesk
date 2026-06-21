@@ -12,7 +12,7 @@ describe('Users Module API Tests', () => {
       name: 'User Admin',
       email: 'useradmin@company.com',
       password: 'password123',
-      companyName: 'User Co'
+      companyName: 'User Co',
     });
     accessToken = res.body.data.accessToken;
     tenantId = res.body.data.user.tenantId;
@@ -33,7 +33,7 @@ describe('Users Module API Tests', () => {
       .patch('/api/v1/users/me')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        name: 'User Admin Updated'
+        name: 'User Admin Updated',
       });
 
     expect(res.statusCode).toBe(200);

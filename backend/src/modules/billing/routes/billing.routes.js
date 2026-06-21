@@ -17,7 +17,16 @@ router.use(requireAuth, requireTenant, requireRole(['Admin']));
 import { idempotencyMiddleware } from '../../../api/middlewares/idempotency.js';
 
 router.get('/subscription', billingController.getSubscription);
-router.post('/checkout', idempotencyMiddleware, validate(billingValidation.checkout), billingController.checkout);
-router.post('/portal', validate(billingValidation.portal), billingController.portal);
+router.post(
+  '/checkout',
+  idempotencyMiddleware,
+  validate(billingValidation.checkout),
+  billingController.checkout
+);
+router.post(
+  '/portal',
+  validate(billingValidation.portal),
+  billingController.portal
+);
 
 export default router;

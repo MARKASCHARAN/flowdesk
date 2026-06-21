@@ -11,7 +11,7 @@ describe('Billing Module API Tests', () => {
       name: 'Billing Admin',
       email: 'billingadmin@company.com',
       password: 'password123',
-      companyName: 'Billing Co'
+      companyName: 'Billing Co',
     });
     accessToken = res.body.data.accessToken;
     tenantId = res.body.data.user.tenantId;
@@ -33,7 +33,7 @@ describe('Billing Module API Tests', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         priceId: 'price_12345',
-        frontendUrl: 'https://flowdesk.app'
+        frontendUrl: 'https://flowdesk.app',
       });
 
     expect(res.statusCode).toBe(200);
@@ -46,7 +46,7 @@ describe('Billing Module API Tests', () => {
       .post('/api/v1/billing/portal')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        returnUrl: 'https://flowdesk.app/dashboard'
+        returnUrl: 'https://flowdesk.app/dashboard',
       });
 
     expect(res.statusCode).toBe(200);
@@ -60,9 +60,9 @@ describe('Billing Module API Tests', () => {
       data: {
         object: {
           id: 'cs_mock_123',
-          client_reference_id: tenantId // This ties the checkout to our tenant
-        }
-      }
+          client_reference_id: tenantId, // This ties the checkout to our tenant
+        },
+      },
     };
 
     // We send it as a raw string so express.raw() parses it into a buffer correctly
@@ -78,7 +78,7 @@ describe('Billing Module API Tests', () => {
     // Verify the tenant plan was upgraded to premium
     const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
     expect(tenant.plan).toBe('premium');
-    
+
     // Verify a subscription record was created
     const sub = await prisma.subscription.findFirst({ where: { tenantId } });
     expect(sub).toBeDefined();

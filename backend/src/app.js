@@ -25,20 +25,22 @@ const app = express();
  * ------------------------------------------------------------------------
  * 1. Global Security & CORS
  * ------------------------------------------------------------------------
- * Industry standard: Security headers and CORS must be the very first 
+ * Industry standard: Security headers and CORS must be the very first
  * middlewares loaded to protect all downstream routes.
  */
 app.use(helmet());
-app.use(cors({
-  origin: config.env === 'production' ? process.env.FRONTEND_URL : '*',
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: config.env === 'production' ? process.env.FRONTEND_URL : '*',
+    credentials: true,
+  })
+);
 
 /**
  * ------------------------------------------------------------------------
  * 2. Rate Limiting
  * ------------------------------------------------------------------------
- * Industry standard: Protect APIs from brute-force and DDoS attacks before 
+ * Industry standard: Protect APIs from brute-force and DDoS attacks before
  * hitting business logic or DB.
  */
 app.use('/api', apiLimiter);
@@ -47,7 +49,7 @@ app.use('/api', apiLimiter);
  * ------------------------------------------------------------------------
  * 3. Observability & Logging
  * ------------------------------------------------------------------------
- * Industry standard: Log the request immediately after it passes basic security 
+ * Industry standard: Log the request immediately after it passes basic security
  * checks, ensuring we capture high-quality metrics and debug traces.
  */
 app.use(httpLogger);
@@ -59,8 +61,8 @@ const metricsMiddleware = promBundle({
   includeStatusCode: true,
   includeUp: true,
   promClient: {
-    collectDefaultMetrics: {}
-  }
+    collectDefaultMetrics: {},
+  },
 });
 app.use(metricsMiddleware);
 
@@ -92,7 +94,7 @@ app.use(contextMiddleware); // Initialize AsyncLocalStorage context
  * ------------------------------------------------------------------------
  * 5. Healthcheck Route
  * ------------------------------------------------------------------------
- * Industry standard: An unauthenticated endpoint for Kubernetes, AWS ELB, 
+ * Industry standard: An unauthenticated endpoint for Kubernetes, AWS ELB,
  * or Docker health checks to ping to verify the server is alive.
  */
 app.get('/health', (req, res) => {
@@ -131,7 +133,7 @@ app.use('/api/v1/admin', adminRoutes);
  * ------------------------------------------------------------------------
  * 7. Catch-All 404 Handler
  * ------------------------------------------------------------------------
- * Industry standard: If a request makes it past all routes without being 
+ * Industry standard: If a request makes it past all routes without being
  * resolved, we explicitly catch it and pass a 404 AppError to the global handler.
  */
 app.use((req, res, next) => {
@@ -142,7 +144,7 @@ app.use((req, res, next) => {
  * ------------------------------------------------------------------------
  * 8. Global Error Handler
  * ------------------------------------------------------------------------
- * Industry standard: Must be the absolute last middleware. 
+ * Industry standard: Must be the absolute last middleware.
  * Catches all `next(err)` calls and formats a standardized JSON error response.
  */
 app.use(errorHandler);

@@ -2,7 +2,7 @@ import { prisma } from './src/infra/db/prisma.js';
 
 async function main() {
   const latestTenant = await prisma.tenant.findFirst({
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
   });
 
   if (!latestTenant) {
@@ -18,22 +18,22 @@ async function main() {
       name: 'Stark Industries',
       email: 'tony@stark.com',
       company: 'Stark Industries',
-      status: 'active'
+      status: 'active',
     },
     {
       tenantId: latestTenant.id,
       name: 'Wayne Enterprises',
       email: 'bruce@wayne.com',
       company: 'Wayne Enterprises',
-      status: 'active'
+      status: 'active',
     },
     {
       tenantId: latestTenant.id,
       name: 'Acme Corp',
       email: 'wile@acme.com',
       company: 'Acme Corp',
-      status: 'churned'
-    }
+      status: 'churned',
+    },
   ];
 
   for (const c of customers) {
@@ -44,7 +44,7 @@ async function main() {
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error(e);
     process.exit(1);
   })

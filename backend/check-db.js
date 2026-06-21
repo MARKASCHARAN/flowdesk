@@ -3,8 +3,8 @@ import { prisma } from './src/infra/db/prisma.js';
 async function main() {
   const tickets = await prisma.ticket.findMany({
     include: {
-      customer: true
-    }
+      customer: true,
+    },
   });
 
   const customers = await prisma.customer.findMany();
@@ -17,5 +17,5 @@ async function main() {
 }
 
 main()
-  .catch(e => console.error(e))
+  .catch((e) => console.error(e))
   .finally(() => prisma.$disconnect());

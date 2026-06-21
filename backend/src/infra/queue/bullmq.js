@@ -8,11 +8,11 @@ const connection = redis;
 
 /**
  * Queue Factory
- * 
- * Industry standard: Encapsulate the creation of Queues to ensure they all 
+ *
+ * Industry standard: Encapsulate the creation of Queues to ensure they all
  * share the same Redis connection pool and standard configuration.
  * BullMQ handles offloading heavy operations (like emails) to background processes.
- * 
+ *
  * @param {string} queueName - Name of the queue (e.g., 'email-queue', 'report-queue')
  * @returns {Queue} BullMQ Queue instance
  */

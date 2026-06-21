@@ -14,10 +14,10 @@ export const analyticsRepository = {
   },
 
   async getTicketTrends(tenantId) {
-    // In PostgreSQL, date_trunc can group by day. For Prisma, a common approach 
-    // is using groupBy on createdAt, but since Prisma's groupBy doesn't fully support 
+    // In PostgreSQL, date_trunc can group by day. For Prisma, a common approach
+    // is using groupBy on createdAt, but since Prisma's groupBy doesn't fully support
     // date_trunc easily across all DBs without raw queries, we use a raw query or fetch recent.
-    
+
     // For this boilerplate, we'll return a simple raw query aggregate
     const result = await prisma.$queryRaw`
       SELECT DATE_TRUNC('day', "createdAt") as date, COUNT(*) as count
@@ -27,10 +27,10 @@ export const analyticsRepository = {
       ORDER BY date ASC;
     `;
 
-    return result.map(row => ({
+    return result.map((row) => ({
       date: row.date,
       // BigInt from postgres count needs to be cast to Number
-      count: Number(row.count)
+      count: Number(row.count),
     }));
-  }
+  },
 };

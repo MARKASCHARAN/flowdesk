@@ -15,9 +15,9 @@ const defaultJobOptions = {
 };
 
 export const createQueue = (queueName) => {
-  return new Queue(queueName, { 
+  return new Queue(queueName, {
     connection,
-    defaultJobOptions
+    defaultJobOptions,
   });
 };
 

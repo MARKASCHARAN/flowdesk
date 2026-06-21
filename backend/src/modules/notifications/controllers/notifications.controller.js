@@ -17,16 +17,22 @@ export const notificationsController = {
         options.isRead = req.query.isRead === 'true';
       }
 
-      const { notifications, total, unreadCount } = await notificationsService.getNotifications(
-        res.locals.tenantId,
-        req.user.id,
-        options
-      );
+      const { notifications, total, unreadCount } =
+        await notificationsService.getNotifications(
+          res.locals.tenantId,
+          req.user.id,
+          options
+        );
 
       sendResponse(res, 200, {
         notifications,
         unreadCount,
-        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
       });
     } catch (error) {
       next(error);
@@ -48,7 +54,10 @@ export const notificationsController = {
 
   async markAllAsRead(req, res, next) {
     try {
-      await notificationsService.markAllAsRead(res.locals.tenantId, req.user.id);
+      await notificationsService.markAllAsRead(
+        res.locals.tenantId,
+        req.user.id
+      );
       sendResponse(res, 200, null, 'All notifications marked as read');
     } catch (error) {
       next(error);
@@ -66,5 +75,5 @@ export const notificationsController = {
     } catch (error) {
       next(error);
     }
-  }
+  },
 };

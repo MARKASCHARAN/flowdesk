@@ -13,7 +13,10 @@ export const tenantsController = {
 
   async updateTenant(req, res, next) {
     try {
-      const tenant = await tenantsService.updateTenant(res.locals.tenantId, req.body);
+      const tenant = await tenantsService.updateTenant(
+        res.locals.tenantId,
+        req.body
+      );
       sendResponse(res, 200, tenant, 'Tenant updated successfully');
     } catch (error) {
       next(error);

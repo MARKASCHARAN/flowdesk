@@ -12,5 +12,5 @@ export const notificationsValidation = {
     params: joi.object().keys({
       id: joi.string().uuid().required(),
     }),
-  }
+  },
 };

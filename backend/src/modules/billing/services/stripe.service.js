@@ -5,12 +5,16 @@ import logger from '../../../infra/logger/index.js';
 
 // We fallback to a mock client if there's no STRIPE_SECRET_KEY, useful for testing environments
 const isMock = !config.stripe || !config.stripe.secretKey;
-const stripe = isMock ? null : new Stripe(config.stripe.secretKey, {
-  apiVersion: '2024-04-10',
-});
+const stripe = isMock
+  ? null
+  : new Stripe(config.stripe.secretKey, {
+      apiVersion: '2024-04-10',
+    });
 
 if (isMock) {
-  logger.warn('STRIPE_SECRET_KEY is missing. Stripe service is running in mock mode.');
+  logger.warn(
+    'STRIPE_SECRET_KEY is missing. Stripe service is running in mock mode.'
+  );
 }
 
 export const stripeService = {
@@ -24,8 +28,18 @@ export const stripeService = {
     }
   },
 
-  async createCheckoutSession(customerId, priceId, successUrl, cancelUrl, clientReferenceId) {
-    if (isMock) return { id: `cs_mock_${Date.now()}`, url: `${successUrl}?session_id=mock` };
+  async createCheckoutSession(
+    customerId,
+    priceId,
+    successUrl,
+    cancelUrl,
+    clientReferenceId
+  ) {
+    if (isMock)
+      return {
+        id: `cs_mock_${Date.now()}`,
+        url: `${successUrl}?session_id=mock`,
+      };
     try {
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
@@ -68,11 +82,11 @@ export const stripeService = {
         throw new Error('Invalid mock payload: ' + e.message);
       }
     }
-    
+
     try {
       return stripe.webhooks.constructEvent(rawBody, signature, secret);
     } catch (error) {
       throw new AppError(400, `Webhook Error: ${error.message}`);
     }
-  }
+  },
 };

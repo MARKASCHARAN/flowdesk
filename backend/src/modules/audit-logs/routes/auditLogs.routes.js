@@ -11,6 +11,10 @@ const router = Router();
 router.use(requireAuth, requireTenant, requireRole(['Admin'])); // Only admins can see audit logs
 
 // GET /api/v1/audit-logs
-router.get('/', validate(auditLogsValidation.listQuery), auditLogsController.getLogs);
+router.get(
+  '/',
+  validate(auditLogsValidation.listQuery),
+  auditLogsController.getLogs
+);
 
 export default router;

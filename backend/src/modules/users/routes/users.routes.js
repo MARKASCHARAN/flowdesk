@@ -14,11 +14,29 @@ router.use(requireAuth, requireTenant);
 
 // Profile Management (Self)
 router.get('/me', usersController.getProfile);
-router.patch('/me', validate(usersValidation.updateProfile), usersController.updateProfile);
-router.post('/me/avatar', memoryUpload.single('avatar'), usersController.uploadAvatar);
+router.patch(
+  '/me',
+  validate(usersValidation.updateProfile),
+  usersController.updateProfile
+);
+router.post(
+  '/me/avatar',
+  memoryUpload.single('avatar'),
+  usersController.uploadAvatar
+);
 
 // Team Management (Admin / Manager only)
-router.get('/team', requireRole(['Admin', 'Manager']), validate(usersValidation.getTeamMembers), usersController.getTeamMembers);
-router.patch('/:id/status', requireRole(['Admin']), validate(usersValidation.updateStatus), usersController.updateStatus);
+router.get(
+  '/team',
+  requireRole(['Admin', 'Manager']),
+  validate(usersValidation.getTeamMembers),
+  usersController.getTeamMembers
+);
+router.patch(
+  '/:id/status',
+  requireRole(['Admin']),
+  validate(usersValidation.updateStatus),
+  usersController.updateStatus
+);
 
 export default router;

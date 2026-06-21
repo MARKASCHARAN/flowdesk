@@ -7,19 +7,16 @@ export const reportingService = {
     const job = await exportQueue.add('export-data', {
       tenantId,
       userId,
-      type
+      type,
     });
 
     // Log the request
-    auditLogsService.logEvent(
-      tenantId,
-      userId,
-      'export.requested',
-      'Report',
-      job.id,
-      { type }
-    ).catch(() => {});
+    auditLogsService
+      .logEvent(tenantId, userId, 'export.requested', 'Report', job.id, {
+        type,
+      })
+      .catch(() => {});
 
     return job.id;
-  }
+  },
 };

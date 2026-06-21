@@ -20,8 +20,10 @@ export const initSocketServer = (httpServer) => {
 
   // Authentication Middleware
   io.use((socket, next) => {
-    const token = socket.handshake.auth?.token || socket.handshake.headers?.authorization?.split(' ')[1];
-    
+    const token =
+      socket.handshake.auth?.token ||
+      socket.handshake.headers?.authorization?.split(' ')[1];
+
     if (!token) {
       return next(new Error('Authentication Error: No token provided'));
     }
@@ -36,7 +38,9 @@ export const initSocketServer = (httpServer) => {
   });
 
   io.on('connection', async (socket) => {
-    logger.info(`[Socket] User ${socket.user.id} connected. Socket ID: ${socket.id}`);
+    logger.info(
+      `[Socket] User ${socket.user.id} connected. Socket ID: ${socket.id}`
+    );
 
     // Automatically join the user to their tenant's global room
     // This allows broadcasting global events to all online users in a tenant.
@@ -73,7 +77,7 @@ export const initSocketServer = (httpServer) => {
 
     socket.on('disconnect', async () => {
       logger.info(`[Socket] User ${socket.user.id} disconnected.`);
-      
+
       // Check if user has any other active sockets
       const userSockets = await io.in(`user_${socket.user.id}`).fetchSockets();
       if (userSockets.length === 0) {

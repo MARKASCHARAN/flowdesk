@@ -9,8 +9,8 @@ export const auditLogsRepository = {
         action,
         resourceType: resource,
         resourceId,
-        metadata: metadata || {}
-      }
+        metadata: metadata || {},
+      },
     });
   },
 
@@ -30,12 +30,12 @@ export const auditLogsRepository = {
         take,
         orderBy: { createdAt: 'desc' },
         include: {
-          user: { select: { name: true, email: true } }
-        }
+          user: { select: { name: true, email: true } },
+        },
       }),
       prisma.auditLog.count({ where }),
     ]);
 
     return { logs, total };
-  }
+  },
 };

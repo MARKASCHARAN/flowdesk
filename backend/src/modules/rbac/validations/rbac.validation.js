@@ -11,10 +11,13 @@ export const rbacValidation = {
     params: joi.object().keys({
       id: joi.string().uuid().required(),
     }),
-    body: joi.object().keys({
-      name: joi.string(),
-      description: joi.string().allow('', null),
-    }).min(1),
+    body: joi
+      .object()
+      .keys({
+        name: joi.string(),
+        description: joi.string().allow('', null),
+      })
+      .min(1),
   },
   roleIdParam: {
     params: joi.object().keys({

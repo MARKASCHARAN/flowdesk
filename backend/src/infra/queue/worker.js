@@ -4,11 +4,11 @@ import logger from '../../infra/logger/index.js';
 
 /**
  * Worker Factory
- * 
+ *
  * Industry standard: Standardize worker creation so every background worker automatically
- * utilizes the shared Redis connection and binds standard lifecycle observability events 
+ * utilizes the shared Redis connection and binds standard lifecycle observability events
  * (logging completions and failures).
- * 
+ *
  * @param {string} queueName - Name of the queue this worker should process
  * @param {function} processor - Async function that handles the job execution
  * @param {object} options - Optional BullMQ worker settings (concurrency, rate limiting, etc.)

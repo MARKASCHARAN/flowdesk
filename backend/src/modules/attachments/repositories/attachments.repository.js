@@ -19,20 +19,20 @@ export const attachmentsRepository = {
         ticketId,
         deletedAt: null,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   },
 
   async findAttachmentById(id, tenantId) {
     return prisma.attachment.findFirst({
-      where: { id, tenantId, deletedAt: null }
+      where: { id, tenantId, deletedAt: null },
     });
   },
 
   async deleteAttachment(id, tenantId) {
     return prisma.attachment.update({
       where: { id },
-      data: { deletedAt: new Date() }
+      data: { deletedAt: new Date() },
     });
-  }
+  },
 };

@@ -8,7 +8,7 @@ export const billingRepository = {
       include: {
         payments: { orderBy: { createdAt: 'desc' }, take: 5 },
         invoices: { orderBy: { createdAt: 'desc' }, take: 5 },
-      }
+      },
     });
   },
 
@@ -19,12 +19,12 @@ export const billingRepository = {
   async updateSubscription(id, data) {
     return prisma.subscription.update({
       where: { id },
-      data
+      data,
     });
   },
 
   async getSubscriptionByProviderRef(providerRef) {
-    // In our schema we don't have providerRef on subscription, 
+    // In our schema we don't have providerRef on subscription,
     // but typically we'd use stripeSubscriptionId.
     // For now we assume we might query by some JSON metadata if needed.
     // Let's assume we map tenantId directly to Stripe Customer ID via tenant metadata or plan.
@@ -39,7 +39,7 @@ export const billingRepository = {
   async updateTenantPlan(tenantId, planName) {
     return prisma.tenant.update({
       where: { id: tenantId },
-      data: { plan: planName }
+      data: { plan: planName },
     });
-  }
+  },
 };

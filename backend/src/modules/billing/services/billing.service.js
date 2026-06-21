@@ -16,7 +16,7 @@ export const billingService = {
         status: 'active',
         seats: 1,
         payments: [],
-        invoices: []
+        invoices: [],
       };
     }
     return sub;
@@ -25,9 +25,13 @@ export const billingService = {
   async createCheckout(tenantId, userId, priceId, frontendUrl) {
     // In a real app, you might map tenantId to a stored Stripe customer ID.
     // For this boilerplate, we'll create a customer on the fly or use a mock.
-    const customer = await stripeService.createCustomer(`tenant_${tenantId}@flowdesk.app`, `Tenant ${tenantId}`, {
-      tenantId
-    });
+    const customer = await stripeService.createCustomer(
+      `tenant_${tenantId}@flowdesk.app`,
+      `Tenant ${tenantId}`,
+      {
+        tenantId,
+      }
+    );
 
     const successUrl = `${frontendUrl}/billing/success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${frontendUrl}/billing/cancel`;
@@ -40,7 +44,16 @@ export const billingService = {
       tenantId // client_reference_id
     );
 
-    auditLogsService.logEvent(tenantId, userId, 'checkout.started', 'Subscription', session.id, { priceId }).catch(() => {});
+    auditLogsService
+      .logEvent(
+        tenantId,
+        userId,
+        'checkout.started',
+        'Subscription',
+        session.id,
+        { priceId }
+      )
+      .catch(() => {});
 
     return { url: session.url };
   },
@@ -49,10 +62,15 @@ export const billingService = {
     // Similarly, we would look up the Stripe Customer ID from the tenant.
     // Mocking here for now.
     const customerId = `cus_mock_tenant_${tenantId}`;
-    const session = await stripeService.createCustomerPortalSession(customerId, returnUrl);
-    
-    auditLogsService.logEvent(tenantId, userId, 'portal.opened', 'Subscription', tenantId).catch(() => {});
-    
+    const session = await stripeService.createCustomerPortalSession(
+      customerId,
+      returnUrl
+    );
+
+    auditLogsService
+      .logEvent(tenantId, userId, 'portal.opened', 'Subscription', tenantId)
+      .catch(() => {});
+
     return { url: session.url };
   },
 
@@ -62,7 +80,11 @@ export const billingService = {
       throw new AppError(500, 'Stripe webhook secret not configured');
     }
 
-    const event = stripeService.verifyWebhookSignature(rawBody, signature, webhookSecret);
+    const event = stripeService.verifyWebhookSignature(
+      rawBody,
+      signature,
+      webhookSecret
+    );
     logger.debug(`WEBHOOK EVENT: ${event.type}`);
 
     switch (event.type) {
@@ -72,9 +94,12 @@ export const billingService = {
         if (tenantId) {
           // Grant Premium access
           logger.info(`UPDATING TENANT PLAN FOR: ${tenantId}`);
-          const updated = await billingRepository.updateTenantPlan(tenantId, 'premium');
+          const updated = await billingRepository.updateTenantPlan(
+            tenantId,
+            'premium'
+          );
           logger.debug(`UPDATED TENANT: ${updated.id}`);
-          
+
           await billingRepository.createSubscription({
             tenantId,
             plan: 'premium',
@@ -83,7 +108,15 @@ export const billingService = {
           });
 
           // Normally you'd log the payment here too
-          auditLogsService.logEvent(tenantId, 'system', 'subscription.activated', 'Subscription', session.id).catch(() => {});
+          auditLogsService
+            .logEvent(
+              tenantId,
+              'system',
+              'subscription.activated',
+              'Subscription',
+              session.id
+            )
+            .catch(() => {});
         }
         break;
       }
@@ -103,5 +136,5 @@ export const billingService = {
     }
 
     return { received: true };
-  }
+  },
 };

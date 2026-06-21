@@ -9,5 +9,5 @@ export const auditLogsValidation = {
       action: joi.string(),
       resource: joi.string(),
     }),
-  }
+  },
 };

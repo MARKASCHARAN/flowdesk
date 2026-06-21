@@ -6,7 +6,7 @@ import fetch from 'node-fetch';
 
 /**
  * Webhook Worker
- * 
+ *
  * Industry standard: Outgoing webhooks should NEVER block the main thread.
  * They are queued with retries, exponential backoff, and signed using HMAC
  * SHA-256 so the receiving server can verify the payload originated from us.
@@ -16,7 +16,7 @@ export const startWebhookWorker = () => {
     'webhook-queue',
     async (job) => {
       const { url, payload, secret, eventType, tenantId } = job.data;
-      
+
       // Generate signature
       const timestamp = Date.now().toString();
       const signaturePayload = `${timestamp}.${JSON.stringify(payload)}`;
@@ -25,7 +25,9 @@ export const startWebhookWorker = () => {
         .update(signaturePayload)
         .digest('hex');
 
-      logger.info(`[Webhook] Sending ${eventType} to ${url} (Tenant: ${tenantId})`);
+      logger.info(
+        `[Webhook] Sending ${eventType} to ${url} (Tenant: ${tenantId})`
+      );
 
       const response = await fetch(url, {
         method: 'POST',

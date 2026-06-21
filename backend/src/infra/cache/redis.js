@@ -4,8 +4,8 @@ import logger from '../../infra/logger/index.js';
 
 /**
  * Central Redis Client
- * 
- * Industry standard: Maintain a single Redis connection pool across the application 
+ *
+ * Industry standard: Maintain a single Redis connection pool across the application
  * for caching, queue management (BullMQ), and potential Pub/Sub (WebSockets).
  * `maxRetriesPerRequest: null` is strictly required by BullMQ to prevent the worker
  * from stalling when Redis temporarily drops the connection.

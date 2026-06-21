@@ -18,5 +18,5 @@ export const adminController = {
     } catch (error) {
       next(error);
     }
-  }
+  },
 };

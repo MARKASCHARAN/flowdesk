@@ -7,7 +7,10 @@ export const attachmentsController = {
     try {
       const { fileName, mimeType, fileSize } = req.body;
       if (!fileName || !mimeType || !fileSize) {
-        throw new AppError(400, 'Missing fileName, mimeType, or fileSize in body');
+        throw new AppError(
+          400,
+          'Missing fileName, mimeType, or fileSize in body'
+        );
       }
 
       const result = await attachmentsService.generatePresignedUrl(
@@ -18,7 +21,7 @@ export const attachmentsController = {
         mimeType,
         fileSize
       );
-      
+
       sendResponse(res, 201, result, 'Presigned URL generated successfully');
     } catch (error) {
       next(error);
@@ -31,7 +34,7 @@ export const attachmentsController = {
         res.locals.tenantId,
         req.params.ticketId
       );
-      
+
       sendResponse(res, 200, attachments);
     } catch (error) {
       next(error);
@@ -50,5 +53,5 @@ export const attachmentsController = {
     } catch (error) {
       next(error);
     }
-  }
+  },
 };

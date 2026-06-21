@@ -4,8 +4,8 @@ export const adminService = {
   async getAllTenants() {
     return prisma.tenant.findMany({
       include: {
-        subscriptions: true
-      }
+        subscriptions: true,
+      },
     });
   },
 
@@ -14,7 +14,7 @@ export const adminService = {
     // If you don't have a status field yet, we will just update the plan to 'suspended'
     return prisma.tenant.update({
       where: { id: tenantId },
-      data: { plan: 'suspended' }
+      data: { plan: 'suspended' },
     });
-  }
+  },
 };

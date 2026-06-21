@@ -11,7 +11,7 @@ describe('Tenants Module API Tests', () => {
       name: 'Tenant Admin',
       email: 'tenantadmin@company.com',
       password: 'password123',
-      companyName: 'Tenant Co'
+      companyName: 'Tenant Co',
     });
     accessToken = res.body.data.accessToken;
     tenantId = res.body.data.user.tenantId;
@@ -31,7 +31,7 @@ describe('Tenants Module API Tests', () => {
       .patch('/api/v1/tenants')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        name: 'Tenant Co Updated'
+        name: 'Tenant Co Updated',
       });
 
     expect(res.statusCode).toBe(200);
@@ -44,7 +44,7 @@ describe('Tenants Module API Tests', () => {
       name: 'Normal User',
       email: 'normal@company.com',
       password: 'password123',
-      companyName: 'Normal Co' // Will create a new tenant but we can just test the role guard
+      companyName: 'Normal Co', // Will create a new tenant but we can just test the role guard
     });
     const normalToken = normalUser.body.data.accessToken;
 

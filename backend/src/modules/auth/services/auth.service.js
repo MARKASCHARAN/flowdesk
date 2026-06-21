@@ -4,7 +4,11 @@ import crypto from 'crypto';
 import { authRepository } from '../repositories/auth.repository.js';
 import { AppError } from '../../../infra/errors/AppError.js';
 import { config } from '../../../infra/config/env.js';
-import { setCache, getCache, deleteCache } from '../../../infra/cache/helpers.js';
+import {
+  setCache,
+  getCache,
+  deleteCache,
+} from '../../../infra/cache/helpers.js';
 import { defaultQueue } from '../../../infra/queue/bullmq.js';
 
 export const generateTokens = (user) => {
@@ -20,8 +24,8 @@ export const generateTokens = (user) => {
   });
 
   const refreshToken = jwt.sign(
-    { id: user.id, jti: crypto.randomUUID() }, 
-    config.jwt.secret, 
+    { id: user.id, jti: crypto.randomUUID() },
+    config.jwt.secret,
     { expiresIn: '7d' }
   );
 
@@ -42,11 +46,11 @@ export const authService = {
       name,
       companyName,
     });
-    
+
     // We fetch user again to get the included tenant/memberships
     const fullUser = await authRepository.findUserById(user.id);
     const { accessToken, refreshToken } = generateTokens(fullUser);
-    
+
     return { user: fullUser, accessToken, refreshToken };
   },
 
@@ -73,7 +77,7 @@ export const authService = {
     try {
       const decoded = jwt.verify(token, config.jwt.secret);
       const session = await authRepository.findSessionByToken(token);
-      
+
       if (!session || session.expiresAt < new Date()) {
         throw new AppError(401, 'Invalid or expired refresh token');
       }
@@ -84,7 +88,7 @@ export const authService = {
       }
 
       const tokens = generateTokens(user);
-      
+
       // Delete old session, create new
       await authRepository.deleteSession(token);
       return { user, ...tokens };
@@ -108,7 +112,7 @@ export const authService = {
     if (!user) return; // Silent fail for security
 
     const resetToken = crypto.randomBytes(32).toString('hex');
-    
+
     // Store in Redis for 1 hour (3600 seconds)
     await setCache(`pwd_reset:${resetToken}`, user.id, 3600);
 

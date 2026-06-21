@@ -34,7 +34,9 @@ export const notificationsRepository = {
   },
 
   async markAsRead(id, tenantId, userId) {
-    const notification = await prisma.notification.findFirst({ where: { id, tenantId, userId } });
+    const notification = await prisma.notification.findFirst({
+      where: { id, tenantId, userId },
+    });
     if (!notification) return null;
 
     return prisma.notification.update({
@@ -51,11 +53,13 @@ export const notificationsRepository = {
   },
 
   async deleteNotification(id, tenantId, userId) {
-    const notification = await prisma.notification.findFirst({ where: { id, tenantId, userId } });
+    const notification = await prisma.notification.findFirst({
+      where: { id, tenantId, userId },
+    });
     if (!notification) return null;
 
     return prisma.notification.delete({
       where: { id },
     });
-  }
+  },
 };

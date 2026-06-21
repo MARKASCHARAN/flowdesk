@@ -11,25 +11,21 @@ describe('Tenant Data Isolation Security Tests', () => {
 
   beforeAll(async () => {
     // 1. Setup Tenant A
-    const resA = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        name: 'Admin A',
-        email: 'admin.a@startup.com',
-        password: 'Password123!',
-        companyName: 'Company A'
-      });
+    const resA = await request(app).post('/api/v1/auth/register').send({
+      name: 'Admin A',
+      email: 'admin.a@startup.com',
+      password: 'Password123!',
+      companyName: 'Company A',
+    });
     tenantA = resA.body.data;
 
     // 2. Setup Tenant B
-    const resB = await request(app)
-      .post('/api/v1/auth/register')
-      .send({
-        name: 'Admin B',
-        email: 'admin.b@corp.com',
-        password: 'Password123!',
-        companyName: 'Company B'
-      });
+    const resB = await request(app).post('/api/v1/auth/register').send({
+      name: 'Admin B',
+      email: 'admin.b@corp.com',
+      password: 'Password123!',
+      companyName: 'Company B',
+    });
     tenantB = resB.body.data;
   });
 
@@ -51,7 +47,7 @@ describe('Tenant Data Isolation Security Tests', () => {
       .post('/api/v1/crm/customers')
       .set('Authorization', `Bearer ${tenantA.accessToken}`)
       .send({ name: 'Customer A', email: 'cust.a@test.com' });
-    
+
     expect(custRes.status).toBe(201);
     const customerId = custRes.body.data.id;
 
@@ -63,7 +59,7 @@ describe('Tenant Data Isolation Security Tests', () => {
         customerId,
         title: 'Tenant A Secret Ticket',
         description: 'Only Tenant A should see this',
-        priority: 'high'
+        priority: 'high',
       });
 
     expect(ticketRes.status).toBe(201);

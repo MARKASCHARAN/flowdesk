@@ -11,9 +11,21 @@ const router = Router();
 router.use(requireAuth, requireTenant);
 
 // Only users can manage their own notifications
-router.get('/', validate(notificationsValidation.listQuery), notificationsController.getNotifications);
+router.get(
+  '/',
+  validate(notificationsValidation.listQuery),
+  notificationsController.getNotifications
+);
 router.post('/mark-all-read', notificationsController.markAllAsRead);
-router.patch('/:id/read', validate(notificationsValidation.paramId), notificationsController.markAsRead);
-router.delete('/:id', validate(notificationsValidation.paramId), notificationsController.deleteNotification);
+router.patch(
+  '/:id/read',
+  validate(notificationsValidation.paramId),
+  notificationsController.markAsRead
+);
+router.delete(
+  '/:id',
+  validate(notificationsValidation.paramId),
+  notificationsController.deleteNotification
+);
 
 export default router;

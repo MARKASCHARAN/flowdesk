@@ -12,7 +12,7 @@ describe('CRM Module API Tests', () => {
       name: 'CRM Admin',
       email: 'crmadmin@company.com',
       password: 'password123',
-      companyName: 'CRM Co'
+      companyName: 'CRM Co',
     });
     accessToken = res.body.data.accessToken;
     tenantId = res.body.data.user.tenantId;
@@ -25,7 +25,7 @@ describe('CRM Module API Tests', () => {
       .send({
         name: 'CRM Customer',
         email: 'customer@client.com',
-        company: 'Client Org'
+        company: 'Client Org',
       });
 
     expect(res.statusCode).toBe(201);
@@ -38,7 +38,7 @@ describe('CRM Module API Tests', () => {
       .post('/api/v1/crm/customers')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        email: 'noname@client.com'
+        email: 'noname@client.com',
       });
 
     expect(res.statusCode).toBe(400); // Validation error
@@ -51,7 +51,7 @@ describe('CRM Module API Tests', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         name: 'Duplicate 1',
-        email: 'duplicate@client.com'
+        email: 'duplicate@client.com',
       });
 
     // Try again
@@ -60,7 +60,7 @@ describe('CRM Module API Tests', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         name: 'Duplicate 2',
-        email: 'duplicate@client.com'
+        email: 'duplicate@client.com',
       });
 
     expect(res.statusCode).toBe(400);

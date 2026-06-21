@@ -8,20 +8,28 @@ export const auditLogsController = {
       const limit = parseInt(req.query.limit) || 50;
       const skip = (page - 1) * limit;
 
-      const { logs, total } = await auditLogsService.getLogs(res.locals.tenantId, {
-        skip,
-        take: limit,
-        userId: req.query.userId,
-        action: req.query.action,
-        resource: req.query.resource,
-      });
+      const { logs, total } = await auditLogsService.getLogs(
+        res.locals.tenantId,
+        {
+          skip,
+          take: limit,
+          userId: req.query.userId,
+          action: req.query.action,
+          resource: req.query.resource,
+        }
+      );
 
       sendResponse(res, 200, {
         logs,
-        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
       });
     } catch (error) {
       next(error);
     }
-  }
+  },
 };

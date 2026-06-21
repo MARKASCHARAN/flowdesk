@@ -14,14 +14,17 @@ export const crmValidation = {
     params: joi.object().keys({
       id: joi.string().uuid().required(),
     }),
-    body: joi.object().keys({
-      name: joi.string(),
-      email: joi.string().email().allow('', null),
-      phone: joi.string().allow('', null),
-      company: joi.string().allow('', null),
-      tags: joi.array().items(joi.string()).allow(null),
-      status: joi.string().valid('active', 'inactive', 'archived'),
-    }).min(1),
+    body: joi
+      .object()
+      .keys({
+        name: joi.string(),
+        email: joi.string().email().allow('', null),
+        phone: joi.string().allow('', null),
+        company: joi.string().allow('', null),
+        tags: joi.array().items(joi.string()).allow(null),
+        status: joi.string().valid('active', 'inactive', 'archived'),
+      })
+      .min(1),
   },
   createLead: {
     params: joi.object().keys({
@@ -38,11 +41,14 @@ export const crmValidation = {
     params: joi.object().keys({
       id: joi.string().uuid().required(),
     }),
-    body: joi.object().keys({
-      stage: joi.string(),
-      assignedTo: joi.string().uuid().allow(null),
-      priority: joi.string().valid('low', 'medium', 'high').allow(null),
-    }).min(1),
+    body: joi
+      .object()
+      .keys({
+        stage: joi.string(),
+        assignedTo: joi.string().uuid().allow(null),
+        priority: joi.string().valid('low', 'medium', 'high').allow(null),
+      })
+      .min(1),
   },
   addNote: {
     params: joi.object().keys({
@@ -64,5 +70,5 @@ export const crmValidation = {
     params: joi.object().keys({
       id: joi.string().uuid().required(),
     }),
-  }
+  },
 };

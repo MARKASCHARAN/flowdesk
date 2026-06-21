@@ -2,9 +2,9 @@ import rateLimit from 'express-rate-limit';
 
 /**
  * Authentication Rate Limiter
- * 
+ *
  * Industry standard: Protects login and password reset routes from brute-force
- * and dictionary attacks. We only count *failed* requests towards the limit, 
+ * and dictionary attacks. We only count *failed* requests towards the limit,
  * so legitimate users are not penalized for logging in successfully.
  */
 export const authLimiter = rateLimit({
@@ -15,8 +15,8 @@ export const authLimiter = rateLimit({
 
 /**
  * Global API Rate Limiter
- * 
- * Industry standard: Protects general API endpoints from DDoS attacks and 
+ *
+ * Industry standard: Protects general API endpoints from DDoS attacks and
  * scraping bots by capping requests per IP address.
  */
 export const apiLimiter = rateLimit({

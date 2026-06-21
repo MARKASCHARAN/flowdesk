@@ -5,7 +5,10 @@ export const authRepository = {
   async signup({ email, passwordHash, name, companyName }) {
     return prisma.$transaction(async (tx) => {
       // 1. Create Tenant
-      const slug = companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now();
+      const slug =
+        companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-') +
+        '-' +
+        Date.now();
       const tenant = await tx.tenant.create({
         data: {
           name: companyName,
@@ -60,7 +63,13 @@ export const authRepository = {
     });
   },
 
-  async createSession(userId, refreshToken, ipAddress, userAgent, expiresInDays = 7) {
+  async createSession(
+    userId,
+    refreshToken,
+    ipAddress,
+    userAgent,
+    expiresInDays = 7
+  ) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + expiresInDays);
 

@@ -26,22 +26,35 @@ export const commentsController = {
 
       // If user is just a 'Customer' role, we might want to override `includeInternal` to false.
       // Assuming req.user.roles includes 'Admin' or 'Agent' if they are internal staff.
-      const isStaff = req.user.roles && (req.user.roles.includes('Admin') || req.user.roles.includes('Agent') || req.user.roles.includes('Manager'));
-      
+      const isStaff =
+        req.user.roles &&
+        (req.user.roles.includes('Admin') ||
+          req.user.roles.includes('Agent') ||
+          req.user.roles.includes('Manager'));
+
       let includeInternal = req.query.includeInternal !== 'false';
       if (!isStaff) {
         includeInternal = false; // Force false for external users
       }
 
-      const { comments, total } = await commentsService.getCommentsForTicket(res.locals.tenantId, req.params.ticketId, {
-        skip,
-        take: limit,
-        includeInternal
-      });
+      const { comments, total } = await commentsService.getCommentsForTicket(
+        res.locals.tenantId,
+        req.params.ticketId,
+        {
+          skip,
+          take: limit,
+          includeInternal,
+        }
+      );
 
       sendResponse(res, 200, {
         comments,
-        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
       });
     } catch (error) {
       next(error);
@@ -73,5 +86,5 @@ export const commentsController = {
     } catch (error) {
       next(error);
     }
-  }
+  },
 };

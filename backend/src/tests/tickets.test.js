@@ -14,7 +14,7 @@ describe('Tickets Module API Tests', () => {
       name: 'Ticket Admin',
       email: 'ticketadmin@company.com',
       password: 'password123',
-      companyName: 'Ticket Co'
+      companyName: 'Ticket Co',
     });
     accessToken = res.body.data.accessToken;
     tenantId = res.body.data.user.tenantId;
@@ -25,7 +25,7 @@ describe('Tickets Module API Tests', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         name: 'Ticket Customer',
-        email: 'ticketcustomer@client.com'
+        email: 'ticketcustomer@client.com',
       });
     customerId = crmRes.body.data.id;
 
@@ -34,7 +34,7 @@ describe('Tickets Module API Tests', () => {
       name: 'Other Admin',
       email: 'otheradmin@company.com',
       password: 'password123',
-      companyName: 'Other Co'
+      companyName: 'Other Co',
     });
     otherTenantAccessToken = otherRes.body.data.accessToken;
   });
@@ -47,7 +47,7 @@ describe('Tickets Module API Tests', () => {
         customerId,
         title: 'Need help with billing',
         description: 'Where is my invoice?',
-        priority: 'medium'
+        priority: 'medium',
       });
 
     expect(res.statusCode).toBe(201);
@@ -63,7 +63,7 @@ describe('Tickets Module API Tests', () => {
         customerId: 'not-a-uuid',
         title: 'Bad customer ID',
         description: 'Should fail',
-        priority: 'low'
+        priority: 'low',
       });
 
     expect(res.statusCode).toBe(400); // Validation error for UUID
@@ -78,7 +78,7 @@ describe('Tickets Module API Tests', () => {
         customerId,
         title: 'Secret ticket',
         description: 'Should be isolated',
-        priority: 'high'
+        priority: 'high',
       });
     const ticketId = res.body.data.id;
 

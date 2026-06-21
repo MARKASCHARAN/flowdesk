@@ -11,7 +11,10 @@ export const rbacService = {
       return await rbacRepository.createRole(tenantId, data);
     } catch (error) {
       if (error.code === 'P2002') {
-        throw new AppError(400, 'A role with this name already exists in your tenant');
+        throw new AppError(
+          400,
+          'A role with this name already exists in your tenant'
+        );
       }
       throw error;
     }
@@ -21,7 +24,7 @@ export const rbacService = {
     // Prevent updating the default Admin role if needed
     const existing = await rbacRepository.findRoleById(id, tenantId);
     if (!existing) throw new AppError(404, 'Role not found');
-    
+
     if (existing.name === 'Admin' && data.name && data.name !== 'Admin') {
       throw new AppError(403, 'Cannot rename the core Admin role');
     }
@@ -39,7 +42,7 @@ export const rbacService = {
   async deleteRole(id, tenantId) {
     const existing = await rbacRepository.findRoleById(id, tenantId);
     if (!existing) throw new AppError(404, 'Role not found');
-    
+
     if (existing.name === 'Admin') {
       throw new AppError(403, 'Cannot delete the core Admin role');
     }
@@ -53,7 +56,11 @@ export const rbacService = {
     if (!role) throw new AppError(404, 'Role not found');
 
     // Ensure not already assigned
-    const existing = await rbacRepository.findMembership(tenantId, userId, roleId);
+    const existing = await rbacRepository.findMembership(
+      tenantId,
+      userId,
+      roleId
+    );
     if (existing) throw new AppError(400, 'User already has this role');
 
     return rbacRepository.assignRoleToUser(tenantId, userId, roleId);
@@ -69,5 +76,5 @@ export const rbacService = {
     }
 
     await rbacRepository.removeRoleFromUser(tenantId, userId, roleId);
-  }
+  },
 };

@@ -67,10 +67,10 @@ export const rbacRepository = {
       },
     });
   },
-  
+
   async findMembership(tenantId, userId, roleId) {
     return prisma.membership.findFirst({
-      where: { tenantId, userId, roleId }
+      where: { tenantId, userId, roleId },
     });
-  }
+  },
 };

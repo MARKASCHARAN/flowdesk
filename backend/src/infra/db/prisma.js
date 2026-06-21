@@ -8,7 +8,7 @@ import logger from '../../infra/logger/index.js';
 
 /**
  * PostgreSQL Connection Pool
- * 
+ *
  * Industry standard: We use the native `pg` Pool instead of Prisma's default
  * connection management. This allows for better connection pooling, lower latency,
  * and seamless integration with external load balancers (like PgBouncer).
@@ -18,9 +18,9 @@ const adapter = new PrismaPg(pool);
 
 /**
  * Prisma Database Client
- * 
+ *
  * Industry standard: We instantiate a single, globally available Prisma Client instance.
- * It is configured to emit events rather than logging directly to stdout, allowing us 
+ * It is configured to emit events rather than logging directly to stdout, allowing us
  * to pipe all database logs through our centralized Pino logger for observability.
  */
 import { auditExtension } from './auditExtension.js';

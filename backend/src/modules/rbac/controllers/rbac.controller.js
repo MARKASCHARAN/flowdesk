@@ -22,7 +22,11 @@ export const rbacController = {
 
   async updateRole(req, res, next) {
     try {
-      const role = await rbacService.updateRole(req.params.id, res.locals.tenantId, req.body);
+      const role = await rbacService.updateRole(
+        req.params.id,
+        res.locals.tenantId,
+        req.body
+      );
       sendResponse(res, 200, role, 'Role updated successfully');
     } catch (error) {
       next(error);
@@ -41,7 +45,11 @@ export const rbacController = {
   async assignRole(req, res, next) {
     try {
       const { userId, roleId } = req.body;
-      const membership = await rbacService.assignRole(res.locals.tenantId, userId, roleId);
+      const membership = await rbacService.assignRole(
+        res.locals.tenantId,
+        userId,
+        roleId
+      );
       sendResponse(res, 201, membership, 'Role assigned successfully');
     } catch (error) {
       next(error);
@@ -56,5 +64,5 @@ export const rbacController = {
     } catch (error) {
       next(error);
     }
-  }
+  },
 };

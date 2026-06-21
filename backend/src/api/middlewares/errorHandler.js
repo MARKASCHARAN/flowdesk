@@ -4,12 +4,12 @@ import { config } from '../../infra/config/env.js';
 
 /**
  * Global Error Handler Middleware
- * 
+ *
  * Industry standard: This intercepts all errors thrown in the application.
  * It normalizes native Error objects into AppError instances, builds a safe response
- * payload (stripping stack traces in production to prevent data leaks), and logs 
+ * payload (stripping stack traces in production to prevent data leaks), and logs
  * the error context automatically.
- * 
+ *
  * @param {Error} err - The error object
  * @param {object} req - Express request
  * @param {object} res - Express response
@@ -38,7 +38,7 @@ export const errorHandler = (err, req, res, next) => {
   if (config.env === 'development') {
     logger.error(error);
   } else if (!error.isOperational) {
-    // In production, mask the message of unknown internal server errors 
+    // In production, mask the message of unknown internal server errors
     // to avoid leaking database schemas or internal directory structures.
     console.error('ERROR 💥', err);
     return res.status(500).json({

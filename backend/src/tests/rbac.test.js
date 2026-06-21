@@ -11,7 +11,7 @@ describe('RBAC Module API Tests', () => {
       name: 'RBAC Admin',
       email: 'rbacadmin@company.com',
       password: 'password123',
-      companyName: 'RBAC Co'
+      companyName: 'RBAC Co',
     });
     accessToken = res.body.data.accessToken;
     tenantId = res.body.data.user.tenantId;
@@ -34,7 +34,7 @@ describe('RBAC Module API Tests', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         name: 'Support Agent',
-        description: 'Handles support tickets'
+        description: 'Handles support tickets',
       });
 
     expect(res.statusCode).toBe(201);

@@ -8,8 +8,15 @@ export const crmService = {
   async createCustomer(tenantId, userId, data) {
     try {
       const customer = await crmRepository.createCustomer(tenantId, data);
-    
-      auditLogsService.logEvent(tenantId, userId, 'create', 'Customer', customer.id, { email: customer.email });
+
+      auditLogsService.logEvent(
+        tenantId,
+        userId,
+        'create',
+        'Customer',
+        customer.id,
+        { email: customer.email }
+      );
 
       return customer;
     } catch (error) {
@@ -73,5 +80,5 @@ export const crmService = {
     if (!customer) throw new AppError(404, 'Customer not found');
 
     return crmRepository.createNote(tenantId, customerId, userId, body);
-  }
+  },
 };

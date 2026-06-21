@@ -10,6 +10,10 @@ const router = Router();
 router.use(requireAuth, requireTenant);
 
 // GET /api/v1/search/global?q=query&limit=10
-router.get('/global', validate(searchValidation.globalSearch), searchController.globalSearch);
+router.get(
+  '/global',
+  validate(searchValidation.globalSearch),
+  searchController.globalSearch
+);
 
 export default router;

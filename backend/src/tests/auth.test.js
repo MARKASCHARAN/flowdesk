@@ -8,9 +8,9 @@ describe('Auth Module API Tests', () => {
       name: 'John Doe',
       email: 'john@startup.com',
       password: 'StrongPassword123!',
-      companyName: 'Startup Inc'
+      companyName: 'Startup Inc',
     });
-    
+
     expect(res.statusCode).toBe(201);
     expect(res.body.data.accessToken).toBeDefined();
     expect(res.body.data.user.email).toBe('john@startup.com');
@@ -21,9 +21,9 @@ describe('Auth Module API Tests', () => {
       name: 'John Doe',
       email: 'john2@startup.com',
       password: '123', // Too short
-      companyName: 'Startup Inc 2'
+      companyName: 'Startup Inc 2',
     });
-    
+
     expect(res.statusCode).toBe(400); // Validation error
     expect(res.body.code).toBe(400);
   });
@@ -33,16 +33,16 @@ describe('Auth Module API Tests', () => {
       name: 'Jane Doe',
       email: 'jane@startup.com',
       password: 'StrongPassword123!',
-      companyName: 'Startup Inc'
+      companyName: 'Startup Inc',
     });
 
     const res = await request(app).post('/api/v1/auth/register').send({
       name: 'Jane Clone',
       email: 'jane@startup.com', // Duplicate
       password: 'StrongPassword123!',
-      companyName: 'Another Startup'
+      companyName: 'Another Startup',
     });
-    
+
     expect(res.statusCode).toBe(400);
     expect(res.body.message).toMatch(/exists/i);
   });
@@ -53,12 +53,12 @@ describe('Auth Module API Tests', () => {
       name: 'Login Test',
       email: 'login@startup.com',
       password: 'StrongPassword123!',
-      companyName: 'Login Inc'
+      companyName: 'Login Inc',
     });
 
     const res = await request(app).post('/api/v1/auth/login').send({
       email: 'login@startup.com',
-      password: 'StrongPassword123!'
+      password: 'StrongPassword123!',
     });
 
     expect(res.statusCode).toBe(200);
@@ -68,7 +68,7 @@ describe('Auth Module API Tests', () => {
   it('Should fail login with wrong password', async () => {
     const res = await request(app).post('/api/v1/auth/login').send({
       email: 'login@startup.com', // From previous test
-      password: 'WrongPassword!'
+      password: 'WrongPassword!',
     });
 
     expect(res.statusCode).toBe(401);

@@ -15,7 +15,11 @@ export const usersService = {
   },
 
   async updateProfile(userId, tenantId, updateData) {
-    const updatedUser = await usersRepository.updateUserProfile(userId, tenantId, updateData);
+    const updatedUser = await usersRepository.updateUserProfile(
+      userId,
+      tenantId,
+      updateData
+    );
     if (!updatedUser) {
       throw new AppError(404, 'User not found');
     }
@@ -32,14 +36,22 @@ export const usersService = {
 
     const avatarUrl = await uploadFileToS3(file, fileName);
 
-    const updatedUser = await usersRepository.updateUserProfile(userId, tenantId, { avatarUrl });
+    const updatedUser = await usersRepository.updateUserProfile(
+      userId,
+      tenantId,
+      { avatarUrl }
+    );
     if (!updatedUser) throw new AppError(404, 'User not found');
-    
+
     return updatedUser;
   },
 
   async updateStatus(targetUserId, tenantId, status) {
-    const updatedUser = await usersRepository.updateUserProfile(targetUserId, tenantId, { status });
+    const updatedUser = await usersRepository.updateUserProfile(
+      targetUserId,
+      tenantId,
+      { status }
+    );
     if (!updatedUser) {
       throw new AppError(404, 'User not found');
     }
@@ -48,5 +60,5 @@ export const usersService = {
 
   async getTeamMembers(tenantId, options) {
     return usersRepository.findUsersByTenant(tenantId, options);
-  }
+  },
 };

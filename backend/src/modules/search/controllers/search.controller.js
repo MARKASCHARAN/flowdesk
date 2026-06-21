@@ -13,5 +13,5 @@ export const searchController = {
     } catch (error) {
       next(error);
     }
-  }
+  },
 };

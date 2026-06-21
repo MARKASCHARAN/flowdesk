@@ -10,14 +10,17 @@ describe('Search Module API Tests', () => {
       name: 'Search Admin',
       email: 'searchadmin@company.com',
       password: 'password123',
-      companyName: 'Search Co'
+      companyName: 'Search Co',
     });
     accessToken = res.body.data.accessToken;
 
-    await request(app).post('/api/v1/crm/customers').set('Authorization', `Bearer ${accessToken}`).send({
-      name: 'FindMe Customer',
-      email: 'findme@client.com'
-    });
+    await request(app)
+      .post('/api/v1/crm/customers')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        name: 'FindMe Customer',
+        email: 'findme@client.com',
+      });
   });
 
   it('Should find customer globally', async () => {

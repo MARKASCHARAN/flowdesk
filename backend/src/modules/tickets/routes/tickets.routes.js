@@ -10,11 +10,35 @@ const router = Router();
 // All Ticket routes require authentication and a valid tenant context
 router.use(requireAuth, requireTenant);
 
-router.post('/', validate(ticketsValidation.createTicket), ticketsController.createTicket);
-router.get('/', validate(ticketsValidation.listQuery), ticketsController.getTickets);
-router.get('/:id', validate(ticketsValidation.paramId), ticketsController.getTicketById);
-router.patch('/:id', validate(ticketsValidation.updateTicket), ticketsController.updateTicket);
-router.delete('/:id', validate(ticketsValidation.paramId), ticketsController.deleteTicket);
-router.post('/:id/restore', validate(ticketsValidation.paramId), ticketsController.restoreTicket);
+router.post(
+  '/',
+  validate(ticketsValidation.createTicket),
+  ticketsController.createTicket
+);
+router.get(
+  '/',
+  validate(ticketsValidation.listQuery),
+  ticketsController.getTickets
+);
+router.get(
+  '/:id',
+  validate(ticketsValidation.paramId),
+  ticketsController.getTicketById
+);
+router.patch(
+  '/:id',
+  validate(ticketsValidation.updateTicket),
+  ticketsController.updateTicket
+);
+router.delete(
+  '/:id',
+  validate(ticketsValidation.paramId),
+  ticketsController.deleteTicket
+);
+router.post(
+  '/:id/restore',
+  validate(ticketsValidation.paramId),
+  ticketsController.restoreTicket
+);
 
 export default router;
