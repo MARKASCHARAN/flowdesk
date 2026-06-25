@@ -26,7 +26,6 @@ import OAuthCallback from './pages/auth/OAuthCallback';
 
 // App Pages
 import Dashboard from './pages/Dashboard';
-import Placeholder from './pages/Placeholder';
 import GlobalSearch from './pages/GlobalSearch';
 
 // CRM Pages

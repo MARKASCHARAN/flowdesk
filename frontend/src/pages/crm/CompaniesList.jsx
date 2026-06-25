@@ -1,12 +1,33 @@
 import React from 'react';
-import { Search, Filter, Plus, MoreHorizontal } from 'lucide-react';
+import { Search, Filter, Plus, MoreHorizontal, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { crmService } from '../../services/crm.service';
 
 const CompaniesList = () => {
-  const companies = [
-    { id: '1', name: 'Acme Corp', industry: 'Software', mrr: '$4,500', health: 'Excellent' },
-    { id: '2', name: 'Globex', industry: 'Manufacturing', mrr: '$1,200', health: 'Good' },
-    { id: '3', name: 'Initech', industry: 'Technology', mrr: '$8,000', health: 'At Risk' },
-  ];
+  const { data: response, isLoading } = useQuery({
+    queryKey: ['companies-via-customers'],
+    queryFn: () => crmService.getCustomers()
+  });
+
+  const customers = response?.data?.customers || [];
+
+  // Derive unique companies from customers since we don't have a dedicated companies API yet
+  const companiesMap = customers.reduce((acc, c) => {
+    if (c.company) {
+      if (!acc[c.company]) {
+        acc[c.company] = {
+          id: c.company,
+          name: c.company,
+          industry: 'Unknown',
+          mrr: 'N/A',
+          health: c.status === 'active' ? 'Excellent' : 'Good'
+        };
+      }
+    }
+    return acc;
+  }, {});
+
+  const companies = Object.values(companiesMap);
 
   const getHealthStyle = (health) => {
     switch(health) {
@@ -49,43 +70,56 @@ const CompaniesList = () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50/50 text-gray-500 border-b border-gray-200 text-[12px] uppercase tracking-wider font-semibold">
-              <tr>
-                <th className="px-6 py-4">Company Name</th>
-                <th className="px-6 py-4">Industry</th>
-                <th className="px-6 py-4">Monthly Recurring Revenue (MRR)</th>
-                <th className="px-6 py-4">Account Health</th>
-                <th className="px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {companies.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50/50 transition-colors group">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
-                        {c.name.substring(0,2).toUpperCase()}
-                      </div>
-                      <p className="font-bold text-slate-900 cursor-pointer group-hover:text-indigo-600 transition-colors">{c.name}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-gray-500">{c.industry}</td>
-                  <td className="px-6 py-4 font-bold text-slate-900">{c.mrr}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 rounded-full text-[12px] font-bold ${getHealthStyle(c.health)}`}>
-                      {c.health}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-                      <MoreHorizontal size={18} />
-                    </button>
-                  </td>
+          {isLoading ? (
+            <div className="flex justify-center p-12">
+              <Loader2 className="animate-spin text-indigo-600" size={32} />
+            </div>
+          ) : (
+            <table className="w-full text-left text-sm text-gray-600">
+              <thead className="bg-gray-50/50 text-gray-500 border-b border-gray-200 text-[12px] uppercase tracking-wider font-semibold">
+                <tr>
+                  <th className="px-6 py-4">Company Name</th>
+                  <th className="px-6 py-4">Industry</th>
+                  <th className="px-6 py-4">Monthly Recurring Revenue (MRR)</th>
+                  <th className="px-6 py-4">Account Health</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {companies.map((c) => (
+                  <tr key={c.id} className="hover:bg-gray-50/50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+                          {c.name.substring(0,2).toUpperCase()}
+                        </div>
+                        <p className="font-bold text-slate-900 cursor-pointer group-hover:text-indigo-600 transition-colors">{c.name}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-gray-500">{c.industry}</td>
+                    <td className="px-6 py-4 font-bold text-slate-900">{c.mrr}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2.5 py-1 rounded-full text-[12px] font-bold ${getHealthStyle(c.health)}`}>
+                        {c.health}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                        <MoreHorizontal size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {companies.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                      No companies found. Add customers with company names first.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

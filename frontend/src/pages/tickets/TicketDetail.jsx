@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsService } from '../../services/tickets.service';
 import { commentsService } from '../../services/comments.service';
 import { useAuthStore } from '../../store/useAuthStore';
+import { usersService } from '../../services/users.service';
 
 const TicketDetail = () => {
   const navigate = useNavigate();
@@ -23,6 +24,18 @@ const TicketDetail = () => {
   const { data: commentsRes, isLoading: commentsLoading } = useQuery({
     queryKey: ['comments', id],
     queryFn: () => commentsService.getComments(id)
+  });
+
+  const { data: teamRes } = useQuery({
+    queryKey: ['team'],
+    queryFn: () => usersService.getTeam()
+  });
+
+  const updateTicketMutation = useMutation({
+    mutationFn: (data) => ticketsService.updateTicket(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['ticket', id]);
+    }
   });
 
   const createCommentMutation = useMutation({
@@ -71,12 +84,28 @@ const TicketDetail = () => {
           <span>Back to Tickets</span>
         </button>
         <div className="flex gap-2">
-          <span className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[12px] font-bold uppercase tracking-wide">
-            Open
-          </span>
-          <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[12px] font-bold uppercase tracking-wide">
-            High
-          </span>
+          <select 
+            value={ticket.status}
+            onChange={(e) => updateTicketMutation.mutate({ status: e.target.value })}
+            disabled={updateTicketMutation.isLoading}
+            className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[12px] font-bold uppercase tracking-wide outline-none cursor-pointer"
+          >
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="closed">Closed</option>
+          </select>
+          <select 
+            value={ticket.priority}
+            onChange={(e) => updateTicketMutation.mutate({ priority: e.target.value })}
+            disabled={updateTicketMutation.isLoading}
+            className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[12px] font-bold uppercase tracking-wide outline-none cursor-pointer"
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
         </div>
       </div>
 
@@ -202,10 +231,14 @@ const TicketDetail = () => {
                 </label>
                 <select 
                   value={ticket.assigneeId || ''}
-                  disabled
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-500 font-medium outline-none cursor-not-allowed"
+                  onChange={(e) => updateTicketMutation.mutate({ assigneeId: e.target.value || null })}
+                  disabled={updateTicketMutation.isLoading}
+                  className="w-full bg-white hover:bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-slate-700 font-medium outline-none cursor-pointer transition-colors"
                 >
-                  <option value="">{ticket.assignee?.firstName || 'Unassigned'}</option>
+                  <option value="">Unassigned</option>
+                  {teamRes?.data?.users?.map(u => (
+                    <option key={u.id} value={u.id}>{u.firstName || u.name}</option>
+                  ))}
                 </select>
               </div>
 
@@ -215,10 +248,14 @@ const TicketDetail = () => {
                 </label>
                 <select 
                   value={ticket.priority}
-                  disabled
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-500 font-medium outline-none cursor-not-allowed"
+                  onChange={(e) => updateTicketMutation.mutate({ priority: e.target.value })}
+                  disabled={updateTicketMutation.isLoading}
+                  className="w-full bg-white hover:bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-slate-700 font-medium outline-none cursor-pointer transition-colors"
                 >
-                  <option value={ticket.priority}>{ticket.priority}</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="critical">Critical</option>
                 </select>
               </div>
 

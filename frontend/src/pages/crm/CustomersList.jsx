@@ -68,7 +68,8 @@ const CustomersList = () => {
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto pb-12 font-sans text-gray-900 selection:bg-indigo-100">
+    <>
+      <div className="max-w-[1400px] mx-auto pb-12 font-sans text-gray-900 selection:bg-indigo-100">
       
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         
@@ -429,7 +430,7 @@ const CustomersList = () => {
         </div>
       )}
 
-    </div>
+    </>
   );
 };
 

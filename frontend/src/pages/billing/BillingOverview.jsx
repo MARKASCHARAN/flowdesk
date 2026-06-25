@@ -18,12 +18,13 @@ const BillingOverview = () => {
     }
   });
 
-  const sub = response?.data || {
-    plan: 'Professional Plan',
-    status: 'active',
-    seats: 5,
-    endsAt: '2023-11-24T00:00:00.000Z',
-    usage: { apiRequests: 8400, limit: 10000 }
+  const apiData = response?.data;
+  const sub = {
+    plan: apiData?.plan || 'Free Plan',
+    status: apiData?.status || 'active',
+    seats: apiData?.seats || 1,
+    endsAt: apiData?.endsAt || new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+    usage: apiData?.usage || { apiRequests: 0, limit: 10000 }
   };
   return (
     <div className="p-6 md:p-8 lg:p-10 max-w-5xl mx-auto space-y-8">

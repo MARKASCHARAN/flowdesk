@@ -1,6 +1,6 @@
-import { webhookQueue } from '../../infra/queue/queues.js';
-import { prisma } from '../../infra/db/prisma.js';
-import logger from '../../infra/logger/index.js';
+import { webhookQueue } from '../../../infra/queue/queues.js';
+import { prisma } from '../../../infra/db/prisma.js';
+import logger from '../../../infra/logger/index.js';
 
 export const webhookService = {
   /**

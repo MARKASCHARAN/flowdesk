@@ -12,7 +12,7 @@ const TeamList = () => {
     queryFn: () => usersService.getTeam()
   });
 
-  const team = teamRes?.data || [];
+  const team = teamRes?.data?.users || [];
 
   return (
     <div className="p-6 md:p-8 lg:p-10 max-w-7xl mx-auto space-y-6">
@@ -72,17 +72,17 @@ const TeamList = () => {
                     <td className="px-6 py-4">
                       <Link to={`/app/team/${user.id}`} className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
-                          {user.firstName?.charAt(0) || 'U'}
+                          {user.name?.charAt(0) || user.firstName?.charAt(0) || 'U'}
                         </div>
                         <div>
                           <p className="font-medium text-slate-900 group-hover:text-indigo-600 transition-colors">
-                            {user.firstName} {user.lastName}
+                            {user.name || `${user.firstName || ''} ${user.lastName || ''}`}
                           </p>
                           <p className="text-[13px] text-gray-500">{user.email}</p>
                         </div>
                       </Link>
                     </td>
-                    <td className="px-6 py-4 font-medium text-slate-700">{user.role?.name || 'N/A'}</td>
+                    <td className="px-6 py-4 font-medium text-slate-700">{user.memberships?.[0]?.role?.name || user.role?.name || 'N/A'}</td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-full text-[12px] font-medium ${
                         user.status === 'active' ? 'bg-emerald-50 text-emerald-700' : 

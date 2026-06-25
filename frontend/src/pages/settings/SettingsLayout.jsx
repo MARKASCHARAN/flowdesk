@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Settings, Shield, Users, Webhook, Puzzle } from 'lucide-react';
+import { Settings, Shield, Users, Webhook, Puzzle, CreditCard } from 'lucide-react';
 
 const SettingsLayout = () => {
   const navItems = [
@@ -9,6 +9,7 @@ const SettingsLayout = () => {
     { to: '/app/settings/team', label: 'Team', icon: Users },
     { to: '/app/settings/integrations', label: 'Integrations', icon: Puzzle },
     { to: '/app/settings/webhooks', label: 'Webhooks', icon: Webhook },
+    { to: '/app/billing', label: 'Billing', icon: CreditCard }, // added to access billing
   ];
 
   return (

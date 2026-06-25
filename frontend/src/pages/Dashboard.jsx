@@ -1,12 +1,39 @@
 import React from 'react';
 import { 
-  MoreVertical, ChevronDown, Monitor, Server, ShoppingCart, ArrowRight
+  MoreVertical, ChevronDown, Monitor, Server, ShoppingCart, ArrowRight, Loader2
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { adminService } from '../services/admin.service';
+import { ticketsService } from '../services/tickets.service';
 
 const Dashboard = () => {
-  
-  // Waffle Chart Data (7 cols x 5 rows)
-  // 1 = Blue, 0 = Light Grey
+  const { data: statsRes, isLoading: isStatsLoading } = useQuery({
+    queryKey: ['dashboardStats'],
+    queryFn: () => adminService.getDashboardStats()
+  });
+
+  const { data: ticketsRes, isLoading: isTicketsLoading } = useQuery({
+    queryKey: ['tickets'],
+    queryFn: () => ticketsService.getTickets()
+  });
+
+  const stats = statsRes?.data || { totalTickets: 0, openTickets: 0, resolvedTickets: 0, totalCustomers: 0 };
+  const tickets = ticketsRes?.data?.tickets || [];
+
+  // Sort tickets by createdAt descending and take top 4
+  const recentTickets = [...tickets]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 4)
+    .map((t, i) => ({
+      name: t.customer?.name || t.title,
+      status: t.status,
+      statusColor: t.status === 'open' ? '#FF5A5A' : t.status === 'in_progress' ? '#FDE047' : '#B1F136',
+      amount: t.priority,
+      date: new Date(t.createdAt).toLocaleDateString(),
+      img: `https://i.pravatar.cc/150?img=${(i + 1) * 10}`
+    }));
+
+  // Waffle Chart Data (7 cols x 5 rows) - keeping static structure but representing activity
   const waffleData = [
     [0, 0, 0, 0, 1, 0, 0],
     [0, 0, 0, 0, 1, 0, 0],
@@ -15,17 +42,10 @@ const Dashboard = () => {
     [1, 1, 1, 1, 1, 1, 1],
   ];
 
-  const recentOrders = [
-    { name: 'Miracle Lubin', status: 'Canceled', statusColor: '#FF5A5A', amount: '$5,500', date: '08.02.2024', img: 'https://i.pravatar.cc/150?img=1' },
-    { name: 'Angel Geidt', status: 'Pending', statusColor: '#B1F136', amount: '$2,400', date: '06.02.2024', img: 'https://i.pravatar.cc/150?img=3' },
-    { name: 'Zaire Aminoff', status: 'Canceled', statusColor: '#FF5A5A', amount: '$6,900', date: '04.02.2024', img: 'https://i.pravatar.cc/150?img=5' },
-    { name: 'Volter Anderson', status: 'Canceled', statusColor: '#FF5A5A', amount: '$4,900', date: '02.02.2024', img: 'https://i.pravatar.cc/150?img=8' },
-  ];
-
   const topCategories = [
-    { name: 'Billing', count: '7,850', growth: '+420', color: '#E4F4B8', icon: <ShoppingCart size={18} className="text-black" /> },
-    { name: 'Technical', count: '6,300', growth: '+234', color: '#C6DDF8', icon: <Server size={18} className="text-black" /> },
-    { name: 'Sales', count: '5,500', growth: '+556', color: '#FACBC5', icon: <Monitor size={18} className="text-black" /> },
+    { name: 'Total Customers', count: stats.totalCustomers, growth: '+12%', color: '#E4F4B8', icon: <ShoppingCart size={18} className="text-black" /> },
+    { name: 'Open Tickets', count: stats.openTickets, growth: 'Active', color: '#C6DDF8', icon: <Server size={18} className="text-black" /> },
+    { name: 'Resolved Tickets', count: stats.resolvedTickets, growth: 'Done', color: '#FACBC5', icon: <Monitor size={18} className="text-black" /> },
   ];
 
   const returningVisits = [
@@ -36,6 +56,14 @@ const Dashboard = () => {
     { month: 'May', percent: 35 },
     { month: 'Jun', percent: 75 },
   ];
+
+  if (isStatsLoading || isTicketsLoading) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <Loader2 className="animate-spin text-indigo-600" size={32} />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-[1400px] mx-auto animate-in fade-in duration-500 font-sans text-black">
@@ -57,36 +85,28 @@ const Dashboard = () => {
             <div className="flex flex-col lg:flex-row gap-12 lg:gap-8">
               {/* Stats Side */}
               <div className="flex-1">
-                <div className="text-gray-500 text-[13px] mb-1">Total Tickets Resolved</div>
+                <div className="text-gray-500 text-[13px] mb-1">Total Tickets</div>
                 <div className="flex items-center gap-3 mb-10">
-                  <span className="text-[36px] font-medium leading-none">290,340</span>
+                  <span className="text-[36px] font-medium leading-none">{stats.totalTickets}</span>
                   <span className="bg-[#B1F136] text-black text-[12px] font-bold px-2 py-0.5 rounded-[4px]">+12%</span>
                 </div>
 
                 <div className="space-y-5 mb-10">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-[13px] w-[120px]">Average Monthly</span>
+                    <span className="text-gray-600 text-[13px] w-[120px]">Resolved</span>
                     <div className="flex-1 flex items-center gap-1 max-w-[100px]">
-                      <div className="h-1.5 bg-[#4B8DF8] w-[40%]" />
-                      <div className="h-1.5 bg-gray-200 w-[60%]" />
+                      <div className="h-1.5 bg-[#4B8DF8]" style={{ width: `${stats.totalTickets ? (stats.resolvedTickets / stats.totalTickets) * 100 : 0}%` }} />
+                      <div className="h-1.5 bg-gray-200 flex-1" />
                     </div>
-                    <span className="text-black text-[13px] font-mono w-[60px] text-right">48,390</span>
+                    <span className="text-black text-[13px] font-mono w-[60px] text-right">{stats.resolvedTickets}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-[13px] w-[120px]">Highest Month</span>
+                    <span className="text-gray-600 text-[13px] w-[120px]">Open</span>
                     <div className="flex-1 flex items-center gap-1 max-w-[100px]">
-                      <div className="h-1.5 bg-[#4B8DF8] w-[80%]" />
-                      <div className="h-1.5 bg-gray-200 w-[20%]" />
+                      <div className="h-1.5 bg-[#4B8DF8]" style={{ width: `${stats.totalTickets ? (stats.openTickets / stats.totalTickets) * 100 : 0}%` }} />
+                      <div className="h-1.5 bg-gray-200 flex-1" />
                     </div>
-                    <span className="text-black text-[13px] font-mono w-[60px] text-right">62,345</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-[13px] w-[120px]">Lowest Month</span>
-                    <div className="flex-1 flex items-center gap-1 max-w-[100px]">
-                      <div className="h-1.5 bg-[#4B8DF8] w-[20%]" />
-                      <div className="h-1.5 bg-gray-200 w-[80%]" />
-                    </div>
-                    <span className="text-black text-[13px] font-mono w-[60px] text-right">23,890</span>
+                    <span className="text-black text-[13px] font-mono w-[60px] text-right">{stats.openTickets}</span>
                   </div>
                 </div>
 
@@ -109,7 +129,7 @@ const Dashboard = () => {
                         {/* Fake Tooltip for the specific peak block */}
                         {rIdx === 0 && cIdx === 4 && cell === 1 && (
                           <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-[#1E293B] text-white text-[12px] font-mono px-2 py-1 rounded-[4px] whitespace-nowrap z-10">
-                            62,345
+                            Peak
                             <div className="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-[#1E293B]" />
                           </div>
                         )}
@@ -132,44 +152,48 @@ const Dashboard = () => {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-[20px] font-medium text-gray-800">Recent Tickets</h2>
               <button className="text-gray-500 text-[13px] flex items-center gap-2 border border-gray-200 px-3 py-1.5 rounded-[4px] hover:bg-gray-50">
-                <CalendarIcon /> March 10 - April 20
+                <CalendarIcon /> Recent Activity
               </button>
             </div>
 
             <div className="w-full">
-              {recentOrders.map((order, idx) => (
-                <div key={idx} className="flex items-center justify-between py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors -mx-4 px-4 rounded-sm">
-                  
-                  {/* Avatar & Name */}
-                  <div className="flex items-center gap-4 w-[240px]">
-                    <div className="w-10 h-10 rounded-[4px] bg-[#EEF2F6] overflow-hidden shrink-0">
-                      <img src={order.img} alt={order.name} className="w-full h-full object-cover mix-blend-multiply" />
+              {recentTickets.length === 0 ? (
+                <div className="text-center py-8 text-gray-500 text-sm">No recent tickets</div>
+              ) : (
+                recentTickets.map((order, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors -mx-4 px-4 rounded-sm">
+                    
+                    {/* Avatar & Name */}
+                    <div className="flex items-center gap-4 w-[240px]">
+                      <div className="w-10 h-10 rounded-[4px] bg-[#EEF2F6] overflow-hidden shrink-0">
+                        <img src={order.img} alt={order.name} className="w-full h-full object-cover mix-blend-multiply" />
+                      </div>
+                      <span className="text-[14px] font-bold text-gray-800 truncate">{order.name}</span>
                     </div>
-                    <span className="text-[14px] font-bold text-gray-800">{order.name}</span>
-                  </div>
 
-                  {/* Status */}
-                  <div className="flex items-center gap-2 w-[120px]">
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: order.statusColor }} />
-                    <span className="text-[13px] text-gray-600">{order.status}</span>
-                  </div>
+                    {/* Status */}
+                    <div className="flex items-center gap-2 w-[120px]">
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: order.statusColor }} />
+                      <span className="text-[13px] text-gray-600 capitalize">{order.status.replace('_', ' ')}</span>
+                    </div>
 
-                  {/* Amount */}
-                  <div className="text-[13px] font-mono text-gray-800 w-[80px]">
-                    {order.amount}
-                  </div>
+                    {/* Priority */}
+                    <div className="text-[13px] font-mono text-gray-800 w-[80px] capitalize">
+                      {order.amount}
+                    </div>
 
-                  {/* Date */}
-                  <div className="text-[13px] font-mono text-gray-500 w-[100px] text-right">
-                    {order.date}
-                  </div>
+                    {/* Date */}
+                    <div className="text-[13px] font-mono text-gray-500 w-[100px] text-right">
+                      {order.date}
+                    </div>
 
-                  {/* Action */}
-                  <button className="text-gray-400 hover:text-black">
-                    <MoreVertical size={18} />
-                  </button>
-                </div>
-              ))}
+                    {/* Action */}
+                    <button className="text-gray-400 hover:text-black">
+                      <MoreVertical size={18} />
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -181,7 +205,7 @@ const Dashboard = () => {
           {/* CARD 3: Top Categories */}
           <div className="bg-white rounded-[32px] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-gray-50">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-[20px] font-medium text-gray-800">Top Ticket Categories</h2>
+              <h2 className="text-[20px] font-medium text-gray-800">Overview Stats</h2>
               <button className="text-gray-400 hover:text-black">
                 <MoreVertical size={18} />
               </button>

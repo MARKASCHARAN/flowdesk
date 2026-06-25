@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Users, Ticket, BarChart3, Receipt, Search, Bell, Settings, Menu, X, Hexagon, FileText, Blocks
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
+import RoleGuard from '../auth/RoleGuard';
 
 const MainLayout = () => {
   const location = useLocation();
@@ -17,12 +18,14 @@ const MainLayout = () => {
   
   // Minimalist Sidebar Nav
   const navLinks = [
-    { name: 'Dashboard', path: '/app', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
-    { name: 'CRM', path: '/app/crm', icon: <Users size={20} strokeWidth={1.5} /> },
-    { name: 'Tickets', path: '/app/tickets', icon: <Ticket size={20} strokeWidth={1.5} /> },
-    { name: 'Analytics', path: '/app/analytics', icon: <BarChart3 size={20} strokeWidth={1.5} /> },
-    { name: 'Reports', path: '/app/reports', icon: <FileText size={20} strokeWidth={1.5} /> },
-    { name: 'Settings', path: '/app/settings', icon: <Settings size={20} strokeWidth={1.5} /> },
+    { name: 'Dashboard', path: '/app', icon: <LayoutDashboard size={20} strokeWidth={1.5} />, allowedRoles: ['Support Manager', 'Sales Rep', 'Agent', 'Billing Admin'] },
+    { name: 'CRM', path: '/app/crm', icon: <Users size={20} strokeWidth={1.5} />, allowedRoles: ['Support Manager', 'Sales Rep', 'Agent'] },
+    { name: 'Tickets', path: '/app/tickets', icon: <Ticket size={20} strokeWidth={1.5} />, allowedRoles: ['Support Manager', 'Agent'] },
+    { name: 'Team', path: '/app/team', icon: <Blocks size={20} strokeWidth={1.5} />, allowedRoles: ['Support Manager'] },
+    { name: 'Analytics', path: '/app/analytics', icon: <BarChart3 size={20} strokeWidth={1.5} />, allowedRoles: ['Support Manager'] },
+    { name: 'Reports', path: '/app/reports', icon: <FileText size={20} strokeWidth={1.5} />, allowedRoles: ['Support Manager'] },
+    { name: 'Billing', path: '/app/billing', icon: <Receipt size={20} strokeWidth={1.5} />, allowedRoles: ['Billing Admin'] },
+    { name: 'Settings', path: '/app/settings', icon: <Settings size={20} strokeWidth={1.5} />, allowedRoles: [] },
   ];
 
   const NavItem = ({ to, icon, name }) => {
@@ -65,7 +68,9 @@ const MainLayout = () => {
         {/* Nav Links */}
         <nav className="flex flex-col w-full">
           {navLinks.map((link) => (
-            <NavItem key={link.path} to={link.path} icon={link.icon} name={link.name} />
+            <RoleGuard key={link.path} allowedRoles={link.allowedRoles}>
+              <NavItem to={link.path} icon={link.icon} name={link.name} />
+            </RoleGuard>
           ))}
         </nav>
 
@@ -121,14 +126,15 @@ const MainLayout = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden fixed inset-0 top-[64px] bg-white z-40 flex flex-col">
           {navLinks.map((link) => (
-            <Link 
-              key={link.path}
-              to={link.path}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-6 py-4 border-b border-gray-100 flex items-center gap-4 text-black font-medium"
-            >
-              {link.icon} {link.name}
-            </Link>
+            <RoleGuard key={link.path} allowedRoles={link.allowedRoles}>
+              <Link 
+                to={link.path}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="px-6 py-4 border-b border-gray-100 flex items-center gap-4 text-black font-medium"
+              >
+                {link.icon} {link.name}
+              </Link>
+            </RoleGuard>
           ))}
         </div>
       )}

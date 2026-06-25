@@ -129,9 +129,9 @@ const TicketsList = () => {
                       {t.id}
                     </td>
                     <td className="px-6 py-5">
-                      <p className="font-bold text-[14px] text-slate-900 truncate group-hover:text-indigo-600 transition-colors">{t.subject}</p>
+                      <p className="font-bold text-[14px] text-slate-900 truncate group-hover:text-indigo-600 transition-colors">{t.title || t.subject}</p>
                     </td>
-                    <td className="px-6 py-5 font-medium text-[14px] text-slate-700">{t.requester?.firstName || 'System'}</td>
+                    <td className="px-6 py-5 font-medium text-[14px] text-slate-700">{t.customer?.name || t.requester?.firstName || 'System'}</td>
                     <td className="px-6 py-5 text-[14px] text-gray-500">{t.assignee?.firstName || 'Unassigned'}</td>
                     <td className="px-6 py-5">
                       <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wide transition-transform duration-300 group-hover:scale-105 inline-block ${getPriorityStyle(t.priority)}`}>

@@ -65,10 +65,10 @@ const Analytics = () => {
   const currentEfficiencyData = apiData.efficiencyData || efficiencyData;
   const currentActivityData = apiData.activityData || activityData;
   
-  const budgetUsage = apiData.budgetUsage || "$50,734";
-  const customerRating = apiData.customerRating || "4.8";
-  const completedTasks = apiData.completedTasks || "85%";
-  const avgTime = apiData.avgTime || "3.5";
+  const budgetUsage = apiData.totalCustomers || 0; // Repurposing as Total Customers
+  const customerRating = "4.8"; // Hardcoded for now
+  const completedTasks = apiData.totalTickets ? Math.round((apiData.resolvedTickets / apiData.totalTickets) * 100) + "%" : "0%";
+  const avgTime = apiData.openTickets || "0"; // Repurposing as Open Tickets
 
   if (isLoading) {
     return (
@@ -101,7 +101,7 @@ const Analytics = () => {
           {/* BUDGET USAGE */}
           <div className="bg-[#1D262B] border border-[#2A363A] rounded-[24px] p-8 flex flex-col justify-between min-h-[340px]">
             <div>
-              <div className="text-[#8B9A9F] font-mono text-[13px] tracking-wide mb-2 uppercase">Budget usage</div>
+              <div className="text-[#8B9A9F] font-mono text-[13px] tracking-wide mb-2 uppercase">Total Customers</div>
               <div className="text-[48px] font-medium leading-none mb-10">{budgetUsage}</div>
             </div>
 
@@ -301,8 +301,8 @@ const Analytics = () => {
 
           <div className="bg-[#1D262B] border border-[#2A363A] rounded-[24px] p-6 flex justify-between items-center h-[120px]">
             <div>
-              <div className="text-[#8B9A9F] font-mono text-[13px] mb-2">Avg. time</div>
-              <div className="text-[36px] font-medium leading-none">{avgTime} <span className="text-[20px] text-[#8B9A9F] ml-1">h</span></div>
+              <div className="text-[#8B9A9F] font-mono text-[13px] mb-2">Open tickets</div>
+              <div className="text-[36px] font-medium leading-none">{avgTime}</div>
             </div>
             <div className="bg-[#D6FA4A] text-[#1A2226] text-[13px] font-mono px-3 py-1 rounded-full flex items-center gap-1 font-bold mt-[-30px]">
               <ArrowUp size={14} /> 3%
